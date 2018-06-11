@@ -11,76 +11,99 @@ namespace CleanupUserProfile
         static void Main(string[] args)
         {
             var userProfile = Environment.GetFolderPath(SpecialFolder.UserProfile);
+            DoSomething(userProfile,
+            f =>
             {
-                var files = Directory
-                    .GetFiles(userProfile, "*", SearchOption.TopDirectoryOnly)
-                    .Select(f => new FileInfo(f))
-                    .ToList()
-                    ;
+                f.RemoveAll(fn => fn.Name.StartsWith("ntuser.", StringComparison.InvariantCultureIgnoreCase));
+                CheckHidden(f, ".gitconfig");
+            },
+            d =>
+            {
+                CheckHidden(d, ".dotnet");
+                CheckHidden(d, ".omnisharp");
+                CheckHidden(d, ".nuget");
+                CheckHidden(d, ".templateengine");
+                CheckHidden(d, ".vscode");
+                CheckHidden(d, "IntelGraphicsProfiles");
+                CheckHidden(d, "MicrosoftEdgeBackups");
+                CheckHidden(d, "OpenVPN");
 
-                files.RemoveAll(f => f.Name.StartsWith("ntuser.", StringComparison.InvariantCultureIgnoreCase));
-                CheckHidden(files, ".gitconfig");
+                Ignore(d, "AppData");
+                Ignore(d, "Google Drive");
+                Ignore(d, "Documents");
+                Ignore(d, "Pictures");
+                Ignore(d, "Recent");
+                Ignore(d, "Searches");
+                Ignore(d, "Wallpapers");
 
-                foreach (var file in files)
+                CheckEmptyFolder(d, "Desktop");
+                CheckEmptyFolder(d, "Downloads");
+                CheckEmptyFolder(d, "Favorites");
+                CheckEmptyFolder(d, "Links");
+
+                Remove(d, "source");
+            });
+
+            DoSomething(Path.Combine(userProfile, "Documents"),
+            f =>
+            {
+                CheckHidden(f, "Default.rdp");
+            }, d =>
+            {
+                Remove(d, "Visual Studio 2017");
+                Ignore(d, "GIT");
+            });
+
+            DoSomething(Path.Combine(userProfile, "Pictures"),
+            f =>
+            {
+            }, d =>
+            {
+                CheckEmptyFolder(d, "Camera Roll");
+                CheckEmptyFolder(d, "Saved Pictures");
+            });
+
+            DoSomething(Path.Combine(userProfile, "Google Drive"), f =>
+            {
+
+            }, d =>
+            {
+                Ignore(d, "Checklist");
+                Ignore(d, "Documents");
+                Ignore(d, "Draft");
+                Ignore(d, "Images");
+                Ignore(d, "ok");
+                Ignore(d, "Projets");
+                Ignore(d, "TMP");
+
+                CheckHidden(d, ".tmp.drivedownload");
+            });
+        }
+
+        private static void DoSomething(string folder, Action<List<FileInfo>> filesActions, Action<List<DirectoryInfo>> directoriesActions)
+        {
+            void whatToDo(IEnumerable<FileSystemInfo> fileSystemInfos)
+            {
+                foreach (var fileSystemInfo in fileSystemInfos)
                 {
-                    Console.WriteLine(file);
-                }
-
-                var directories = Directory
-                    .GetDirectories(userProfile, "*", SearchOption.TopDirectoryOnly)
-                    .Select(d => new DirectoryInfo(d))
-                    .ToList();
-
-                CheckHidden(directories, ".dotnet");
-                CheckHidden(directories, ".omnisharp");
-                CheckHidden(directories, ".templateengine");
-                CheckHidden(directories, ".vscode");
-                CheckHidden(directories, "IntelGraphicsProfiles");
-                CheckHidden(directories, "MicrosoftEdgeBackups");
-                CheckHidden(directories, "OpenVPN");
-
-                Ignore(directories, "AppData");
-                Ignore(directories, "Google Drive");
-                Ignore(directories, "Documents");
-                Ignore(directories, "Recent");
-                Ignore(directories, "Searches");
-                Ignore(directories, "Wallpapers");
-
-                CheckEmptyFolder(directories, "Desktop");
-                CheckEmptyFolder(directories, "Downloads");
-                CheckEmptyFolder(directories, "Favorites");
-                CheckEmptyFolder(directories, "Links");
-                CheckEmptyFolder(directories, "Pictures");
-
-                foreach (var directory in directories)
-                {
-                    Console.WriteLine($" What to do ? > {directory.FullName}");
+                    Console.WriteLine($" What to do ? {fileSystemInfo.GetType().Name} > {fileSystemInfo.FullName}");
                 }
             }
+
+            var folderInfo = new DirectoryInfo(folder);
+            if(!folderInfo.Exists)
             {
-                var documentsFolder = Path.Combine(userProfile, "Documents");
-                var documentsFolderInfo = new DirectoryInfo(documentsFolder);
-
-                var files = documentsFolderInfo.GetFiles().ToList();
-                foreach (var file in files)
-                {
-                    if (IsDesktopIni(file))
-                    {
-                        continue;
-                    }
-                    Console.WriteLine($" What to do ? > {file.FullName}");
-                }
-
-                var directories = documentsFolderInfo.GetDirectories().ToList();
-
-                Remove(directories, "Visual Studio 2017");
-                Ignore(directories, "GIT");
-
-                foreach (var directory in directories)
-                {
-                    Console.WriteLine($" What to do ? > {directory.FullName}");
-                }
+                return;
             }
+            // files
+            var files = folderInfo.GetFiles().ToList();
+            Ignore(files, "Desktop.ini");
+            filesActions(files);
+            whatToDo(files);
+            // dirs
+            var directories = folderInfo.GetDirectories().ToList();
+            directoriesActions(directories);
+            whatToDo(directories);
         }
 
         private static void Remove(List<DirectoryInfo> directories, string name)
@@ -115,14 +138,14 @@ namespace CleanupUserProfile
             }
         }
 
-        private static void Ignore<T>(List<T> directories, string name) where T : FileSystemInfo
+        private static void Ignore<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
         {
-            directories.TryGetAndRemove(name, out var fileToHide);
+            fileSystemInfos.TryGetAndRemove(name, out var fileToHide);
         }
 
-        private static void CheckHidden<T>(List<T> files, string name) where T : FileSystemInfo
+        private static void CheckHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
         {
-            if (files.TryGetAndRemove(name, out var fileToHide))
+            if (fileSystemInfos.TryGetAndRemove(name, out var fileToHide))
             {
                 File.SetAttributes(fileToHide.FullName, FileAttributes.Hidden);
             }
