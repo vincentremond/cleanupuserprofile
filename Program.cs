@@ -15,7 +15,18 @@ namespace CleanupUserProfile
             f =>
             {
                 f.RemoveAll(fn => fn.Name.StartsWith("ntuser.", StringComparison.InvariantCultureIgnoreCase));
+
                 CheckHidden(f, ".gitconfig");
+
+                Remove(f, ".bash_history");
+                Remove(f, ".csslintrc");
+                Remove(f, ".eslintrc");
+                Remove(f, ".node_repl_history");
+                Remove(f, ".rnd");
+                Remove(f, ".viminfo");
+                Remove(f, "coffeelint.json");
+                Remove(f, "tslint.json");
+
             },
             d =>
             {
@@ -35,12 +46,14 @@ namespace CleanupUserProfile
                 Ignore(d, "Recent");
                 Ignore(d, "Searches");
                 Ignore(d, "Wallpapers");
+                Ignore(d, "Favorites");
+                Ignore(d, "Links");
+                Ignore(d, "OneDrive - FNAC");
 
                 CheckEmptyFolder(d, "Desktop");
                 CheckEmptyFolder(d, "Downloads");
-                CheckEmptyFolder(d, "Favorites");
-                CheckEmptyFolder(d, "Links");
 
+                Remove(d, ".nx");
                 Remove(d, "source");
             });
 
@@ -61,6 +74,8 @@ namespace CleanupUserProfile
             {
                 CheckEmptyFolder(d, "Camera Roll");
                 CheckEmptyFolder(d, "Saved Pictures");
+
+                Ignore(d, "Screenpresso");
             });
 
             DoSomething(Path.Combine(userProfile, "Google Drive"), f =>
@@ -91,7 +106,7 @@ namespace CleanupUserProfile
             }
 
             var folderInfo = new DirectoryInfo(folder);
-            if(!folderInfo.Exists)
+            if (!folderInfo.Exists)
             {
                 return;
             }
@@ -106,11 +121,19 @@ namespace CleanupUserProfile
             whatToDo(directories);
         }
 
-        private static void Remove(List<DirectoryInfo> directories, string name)
+        private static void Remove(List<DirectoryInfo> fileSystemInfos, string name)
         {
-            if (directories.TryGetAndRemove(name, out var directory))
+            if (fileSystemInfos.TryGetAndRemove(name, out var fileSystemInfo))
             {
-                directory.Delete(true);
+                fileSystemInfo.Delete(true);
+            }
+        }
+
+        private static void Remove(List<FileInfo> fileSystemInfos, string name)
+        {
+            if (fileSystemInfos.TryGetAndRemove(name, out var fileSystemInfo))
+            {
+                fileSystemInfo.Delete();
             }
         }
 
