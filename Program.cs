@@ -14,9 +14,11 @@ namespace CleanupUserProfile
             DoSomething(userProfile,
             f =>
             {
+                // ignore ntuser.* files
                 f.RemoveAll(fn => fn.Name.StartsWith("ntuser.", StringComparison.InvariantCultureIgnoreCase));
 
                 CheckHidden(f, ".gitconfig");
+                CheckHidden(f, ".yarnrc");
 
                 Remove(f, ".bash_history");
                 Remove(f, ".csslintrc");
@@ -31,6 +33,7 @@ namespace CleanupUserProfile
             d =>
             {
                 CheckHidden(d, ".dotnet");
+                CheckHidden(d, ".config");
                 CheckHidden(d, ".omnisharp");
                 CheckHidden(d, ".nuget");
                 CheckHidden(d, ".templateengine");
@@ -40,6 +43,7 @@ namespace CleanupUserProfile
                 CheckHidden(d, "OpenVPN");
 
                 Ignore(d, "AppData");
+                Ignore(d, "GoogleDrive");
                 Ignore(d, "Google Drive");
                 Ignore(d, "Documents");
                 Ignore(d, "Pictures");
@@ -52,6 +56,7 @@ namespace CleanupUserProfile
 
                 CheckEmptyFolder(d, "Desktop");
                 CheckEmptyFolder(d, "Downloads");
+                CheckEmptyFolder(d, "Music");
 
                 Remove(d, ".nx");
                 Remove(d, "source");
@@ -63,8 +68,16 @@ namespace CleanupUserProfile
                 CheckHidden(f, "Default.rdp");
             }, d =>
             {
-                Remove(d, "Visual Studio 2017");
                 Ignore(d, "GIT");
+                
+                Remove(d, "Custom Office Templates");
+                Remove(d, "Fiddler2");
+                Remove(d, "My Received Files");
+                Remove(d, "My Web Sites");
+                Remove(d, "Outlook Files");
+                Remove(d, "SQL Server Management Studio");
+                Remove(d, "Visual Studio 2015");
+                Remove(d, "Visual Studio 2017");
             });
 
             DoSomething(Path.Combine(userProfile, "Pictures"),
@@ -125,6 +138,8 @@ namespace CleanupUserProfile
         {
             if (fileSystemInfos.TryGetAndRemove(name, out var fileSystemInfo))
             {
+                fileSystemInfo.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(f => f.Attributes = FileAttributes.Normal);
+                fileSystemInfo.GetFiles("*", SearchOption.AllDirectories).ToList().ForEach(f => f.Delete());
                 fileSystemInfo.Delete(true);
             }
         }
