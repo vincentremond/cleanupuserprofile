@@ -69,10 +69,11 @@ namespace CleanupUserProfile
             }, d =>
             {
                 Ignore(d, "GIT");
-                
+
                 Remove(d, "Custom Office Templates");
                 Remove(d, "Fiddler2");
                 Remove(d, "My Received Files");
+                Remove(d, "IISExpress");
                 Remove(d, "My Web Sites");
                 Remove(d, "Outlook Files");
                 Remove(d, "SQL Server Management Studio");
