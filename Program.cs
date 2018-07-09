@@ -43,16 +43,16 @@ namespace CleanupUserProfile
                 CheckHidden(d, "OpenVPN");
 
                 Ignore(d, "AppData");
-                Ignore(d, "GoogleDrive");
-                Ignore(d, "Google Drive");
                 Ignore(d, "Documents");
+                Ignore(d, "Favorites");
+                Ignore(d, "Google Drive");
+                Ignore(d, "GoogleDrive");
+                Ignore(d, "Links");
+                Ignore(d, "OneDrive - FNAC");
                 Ignore(d, "Pictures");
                 Ignore(d, "Recent");
                 Ignore(d, "Searches");
                 Ignore(d, "Wallpapers");
-                Ignore(d, "Favorites");
-                Ignore(d, "Links");
-                Ignore(d, "OneDrive - FNAC");
 
                 CheckEmptyFolder(d, "Desktop");
                 CheckEmptyFolder(d, "Downloads");
