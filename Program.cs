@@ -32,10 +32,11 @@ namespace CleanupUserProfile
             },
             d =>
             {
-                CheckHidden(d, ".dotnet");
+                CheckHidden(d, ".cache");
                 CheckHidden(d, ".config");
-                CheckHidden(d, ".omnisharp");
+                CheckHidden(d, ".dotnet");
                 CheckHidden(d, ".nuget");
+                CheckHidden(d, ".omnisharp");
                 CheckHidden(d, ".templateengine");
                 CheckHidden(d, ".vscode");
                 CheckHidden(d, "IntelGraphicsProfiles");
