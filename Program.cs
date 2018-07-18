@@ -37,8 +37,10 @@ namespace CleanupUserProfile
                 CheckHidden(d, ".dotnet");
                 CheckHidden(d, ".nuget");
                 CheckHidden(d, ".omnisharp");
+                CheckHidden(d, ".Rider2018.1");
                 CheckHidden(d, ".templateengine");
                 CheckHidden(d, ".vscode");
+                CheckHidden(d, ".vsts");
                 CheckHidden(d, "IntelGraphicsProfiles");
                 CheckHidden(d, "MicrosoftEdgeBackups");
                 CheckHidden(d, "OpenVPN");
