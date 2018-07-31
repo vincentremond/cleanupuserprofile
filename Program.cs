@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static System.Environment;
 
 namespace CleanupUserProfile
@@ -28,6 +29,8 @@ namespace CleanupUserProfile
                 Remove(f, ".viminfo");
                 Remove(f, "coffeelint.json");
                 Remove(f, "tslint.json");
+
+                RemovePattern(f, new Regex(@"^\.v8flags\..+\.json$", RegexOptions.IgnoreCase));
 
             },
             d =>
@@ -110,6 +113,14 @@ namespace CleanupUserProfile
 
                 CheckHidden(d, ".tmp.drivedownload");
             });
+        }
+
+        private static void RemovePattern(List<FileInfo> fileInfos, Regex pattern)
+        {
+            foreach (var toRemove in fileInfos.GetAndRemoveAll(pattern))
+            {
+                toRemove.Delete();
+            }
         }
 
         private static void DoSomething(string folder, Action<List<FileInfo>> filesActions, Action<List<DirectoryInfo>> directoriesActions)
