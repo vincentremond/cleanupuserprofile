@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CleanupUserProfile
 {
@@ -15,6 +16,24 @@ namespace CleanupUserProfile
                 fi.Remove(result);
             }
             return result != null;
+        }
+
+        public static IEnumerable<T> GetAndRemoveAll<T>(this List<T> fi, Regex namePattern) where T : FileSystemInfo
+        {
+            var toRemove = new List<T>();
+            foreach (var f in fi)
+            {
+                if (namePattern.IsMatch(f.Name))
+                {
+                    toRemove.Add(f);
+                    yield return f;
+                }
+            }
+
+            foreach (var t in toRemove)
+            {
+                fi.Remove(t);
+            }
         }
     }
 }
