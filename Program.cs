@@ -53,7 +53,7 @@ namespace CleanupUserProfile
                 Ignore(d, "Favorites");
                 Ignore(d, "Google Drive");
                 Ignore(d, "GoogleDrive");
-                Ignore(d, "Links");
+                CheckHidden(d, "Links");
                 Ignore(d, "OneDrive - FNAC");
                 Ignore(d, "Pictures");
                 Ignore(d, "Recent");
@@ -62,10 +62,15 @@ namespace CleanupUserProfile
 
                 CheckEmptyFolder(d, "Desktop");
                 CheckEmptyFolder(d, "Downloads");
-                CheckEmptyFolder(d, "Music");
 
                 Remove(d, ".nx");
                 Remove(d, "source");
+
+                CheckEmptyFolderAndHidden(d, "Music");
+                CheckEmptyFolderAndHidden(d, "3D Objects");
+                CheckEmptyFolderAndHidden(d, "Contacts");
+                CheckEmptyFolderAndHidden(d, "Videos");
+                CheckEmptyFolderAndHidden(d, "Saved Games");
             });
 
             DoSomething(Path.Combine(userProfile, "Documents"),
@@ -172,7 +177,7 @@ namespace CleanupUserProfile
             return (file is FileInfo x && x.Name.Equals("Desktop.ini", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private static void CheckEmptyFolder(List<DirectoryInfo> directories, string name)
+        private static DirectoryInfo CheckEmptyFolder(List<DirectoryInfo> directories, string name)
         {
             if (directories.TryGetAndRemove(name, out var directory))
             {
@@ -188,6 +193,17 @@ namespace CleanupUserProfile
                     }
                     Console.WriteLine($" Remove me : {file.FullName}");
                 }
+                return directory;
+            }
+            return null;
+        }
+
+        private static void CheckEmptyFolderAndHidden(List<DirectoryInfo> directories, string name)
+        {
+            var directory = CheckEmptyFolder(directories, name);
+            if (directory != null)
+            {
+                File.SetAttributes(directory.FullName, FileAttributes.Hidden);
             }
         }
 
