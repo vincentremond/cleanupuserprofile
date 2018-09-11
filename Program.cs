@@ -42,6 +42,7 @@ namespace CleanupUserProfile
                 CheckHidden(d, ".omnisharp");
                 CheckHidden(d, ".Rider2018.1");
                 CheckHidden(d, ".templateengine");
+                CheckHidden(d, ".sqlops");
                 CheckHidden(d, ".vscode");
                 CheckHidden(d, ".vsts");
                 CheckHidden(d, "IntelGraphicsProfiles");
