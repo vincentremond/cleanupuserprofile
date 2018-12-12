@@ -18,6 +18,16 @@ namespace CleanupUserProfile
             return result != null;
         }
 
+        public static bool TryGetAndRemove<T>(this List<T> fi, Regex namePattern, out T result) where T : FileSystemInfo
+        {
+            result = fi.FirstOrDefault(f => namePattern.IsMatch(f.Name));
+            if (result != null)
+            {
+                fi.Remove(result);
+            }
+            return result != null;
+        }
+
         public static IEnumerable<T> GetAndRemoveAll<T>(this List<T> fi, Regex namePattern) where T : FileSystemInfo
         {
             var toRemove = new List<T>();
