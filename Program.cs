@@ -35,16 +35,8 @@ namespace CleanupUserProfile
             },
             d =>
             {
-                CheckHidden(d, ".cache");
-                CheckHidden(d, ".config");
-                CheckHidden(d, ".dotnet");
-                CheckHidden(d, ".nuget");
-                CheckHidden(d, ".omnisharp");
-                CheckHidden(d, ".Rider2018.1");
-                CheckHidden(d, ".templateengine");
-                CheckHidden(d, ".sqlops");
-                CheckHidden(d, ".vscode");
-                CheckHidden(d, ".vsts");
+                CheckHidden(d, new Regex(@"^\.[\w\d\.-]+$", RegexOptions.IgnoreCase));
+
                 CheckHidden(d, "IntelGraphicsProfiles");
                 CheckHidden(d, "MicrosoftEdgeBackups");
                 CheckHidden(d, "OpenVPN");
@@ -216,6 +208,13 @@ namespace CleanupUserProfile
         private static void CheckHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
         {
             if (fileSystemInfos.TryGetAndRemove(name, out var fileToHide))
+            {
+                File.SetAttributes(fileToHide.FullName, FileAttributes.Hidden);
+            }
+        }
+        private static void CheckHidden<T>(List<T> fileSystemInfos, Regex namePattern) where T : FileSystemInfo
+        {
+            while(fileSystemInfos.TryGetAndRemove(namePattern, out var fileToHide))
             {
                 File.SetAttributes(fileToHide.FullName, FileAttributes.Hidden);
             }
