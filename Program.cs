@@ -24,6 +24,7 @@ namespace CleanupUserProfile
                 Remove(f, ".bash_history");
                 Remove(f, ".csslintrc");
                 Remove(f, ".eslintrc");
+                Remove(f, ".minttyrc");
                 Remove(f, ".node_repl_history");
                 Remove(f, ".rnd");
                 Remove(f, ".viminfo");
