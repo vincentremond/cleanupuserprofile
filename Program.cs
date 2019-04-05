@@ -20,6 +20,7 @@ namespace CleanupUserProfile
 
                 CheckHidden(f, ".gitconfig");
                 CheckHidden(f, ".yarnrc");
+                CheckHidden(f, ".sqltools-setup");
 
                 Remove(f, ".bash_history");
                 Remove(f, ".csslintrc");
