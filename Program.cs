@@ -78,13 +78,14 @@ namespace CleanupUserProfile
 
                 Remove(d, "Custom Office Templates");
                 Remove(d, "Fiddler2");
-                Remove(d, "My Received Files");
                 Remove(d, "IISExpress");
+                Remove(d, "My Received Files");
                 Remove(d, "My Web Sites");
                 Remove(d, "Outlook Files");
                 Remove(d, "SQL Server Management Studio");
                 Remove(d, "Visual Studio 2015");
                 Remove(d, "Visual Studio 2017");
+                Remove(d, "WindowsPowerShell");
             });
 
             DoSomething(Path.Combine(userProfile, "Pictures"),
