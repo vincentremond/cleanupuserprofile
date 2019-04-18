@@ -85,6 +85,7 @@ namespace CleanupUserProfile
                 Remove(d, "SQL Server Management Studio");
                 Remove(d, "Visual Studio 2015");
                 Remove(d, "Visual Studio 2017");
+                Remove(d, "Visual Studio 2019");
                 Remove(d, "WindowsPowerShell");
             });
 
