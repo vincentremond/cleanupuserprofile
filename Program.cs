@@ -100,7 +100,7 @@ namespace CleanupUserProfile
                 Ignore(d, "Screenpresso");
             });
 
-            DoSomething(Path.Combine(userProfile, "Google Drive"), f =>
+            DoSomething(Path.Combine(userProfile, "GoogleDrive"), f =>
             {
 
             }, d =>
