@@ -21,6 +21,7 @@ namespace CleanupUserProfile
                 CheckHidden(f, ".gitconfig");
                 CheckHidden(f, ".yarnrc");
                 CheckHidden(f, ".sqltools-setup");
+                CheckHidden(f, "_lesshst");
 
                 Remove(f, ".bash_history");
                 Remove(f, ".csslintrc");
@@ -37,7 +38,7 @@ namespace CleanupUserProfile
             },
             d =>
             {
-                CheckHidden(d, new Regex(@"^\.[\w\d\.-]+$", RegexOptions.IgnoreCase));
+                CheckHidden(d, new Regex(@"^[_\.][\w\d\.-]+$", RegexOptions.IgnoreCase));
 
                 CheckHidden(d, "IntelGraphicsProfiles");
                 CheckHidden(d, "MicrosoftEdgeBackups");
