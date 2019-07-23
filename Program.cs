@@ -76,10 +76,13 @@ namespace CleanupUserProfile
             }, d =>
             {
                 Ignore(d, "GIT");
+                Ignore(d, "Mes sources de données");
 
                 Remove(d, "Custom Office Templates");
                 Remove(d, "Fiddler2");
                 Remove(d, "IISExpress");
+                Remove(d, "Mes fichiers reçus");
+                Remove(d, "Modèles Office personnalisés");
                 Remove(d, "My Received Files");
                 Remove(d, "My Web Sites");
                 Remove(d, "Outlook Files");
