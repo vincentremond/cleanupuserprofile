@@ -46,13 +46,13 @@ namespace CleanupUserProfile
 
                     Ignore(d, "AppData");
                     Ignore(d, "Documents");
-                    Ignore(d, "Favorites");
+                    CheckHidden(d, "Favorites");
                     Ignore(d, "Google Drive");
                     Ignore(d, "GoogleDrive");
                     Ignore(d, "OneDrive - FNAC");
                     Ignore(d, "Pictures");
                     Ignore(d, "Recent");
-                    Ignore(d, "Searches");
+                    CheckHidden(d, "Searches");
                     Ignore(d, "repos");
                     Ignore(d, "Wallpapers");
 
