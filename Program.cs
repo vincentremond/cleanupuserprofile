@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static System.Environment;
 
 namespace CleanupUserProfile
 {
@@ -11,7 +10,7 @@ namespace CleanupUserProfile
     {
         static void Main(string[] args)
         {
-            var userProfile = Environment.GetFolderPath(SpecialFolder.UserProfile);
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             DoSomething(userProfile,
                 f =>
                 {
@@ -45,12 +44,48 @@ namespace CleanupUserProfile
                     CheckHidden(d, "OpenVPN");
 
                     Ignore(d, "AppData");
-                    Ignore(d, "Documents");
+                    SubDirectory(d, "Documents",
+                        filesActions: df => { CheckHidden(df, "Default.rdp"); }, directoriesActions: dd =>
+                        {
+                            Ignore(dd, "GIT");
+                            Ignore(dd, "Mes sources de données");
+
+                            Remove(dd, "Custom Office Templates");
+                            Remove(dd, "Fiddler2");
+                            Remove(dd, "IISExpress");
+                            Remove(dd, "Mes fichiers reçus");
+                            Remove(dd, "Modèles Office personnalisés");
+                            Remove(dd, "My Received Files");
+                            Remove(dd, "My Web Sites");
+                            Remove(dd, "Outlook Files");
+                            Remove(dd, "SQL Server Management Studio");
+                            Remove(dd, "Visual Studio 2015");
+                            Remove(dd, "Visual Studio 2017");
+                            Remove(dd, "Visual Studio 2019");
+                            Remove(dd, "WindowsPowerShell");
+                        });
                     CheckHidden(d, "Favorites");
-                    Ignore(d, "Google Drive");
-                    Ignore(d, "GoogleDrive");
+                    SubDirectory(d, new[] {"Google Drive", "GoogleDrive"},
+                        directoriesActions: gd =>
+                        {
+                            Ignore(gd, "Checklist");
+                            Ignore(gd, "Documents");
+                            Ignore(gd, "Draft");
+                            Ignore(gd, "Images");
+                            Ignore(gd, "ok");
+                            Ignore(gd, "Projets");
+                            Ignore(gd, "TMP");
+
+                            CheckHidden(gd, ".tmp.drivedownload");
+                        });
                     Ignore(d, "OneDrive - FNAC");
-                    Ignore(d, "Pictures");
+                    SubDirectory(d, "Pictures", directoriesActions: pd =>
+                    {
+                        CheckEmptyFolder(pd, "Camera Roll");
+                        CheckEmptyFolder(pd, "Saved Pictures");
+
+                        Ignore(pd, "Screenpresso");
+                    });
                     Ignore(d, "Recent");
                     CheckHidden(d, "Searches");
                     Ignore(d, "repos");
@@ -68,49 +103,6 @@ namespace CleanupUserProfile
                     CheckEmptyFolderAndHidden(d, "Videos");
                     CheckEmptyFolderAndHidden(d, "Saved Games");
                 });
-
-            DoSomething(Path.Combine(userProfile, "Documents"),
-                f => { CheckHidden(f, "Default.rdp"); }, d =>
-                {
-                    Ignore(d, "GIT");
-                    Ignore(d, "Mes sources de données");
-
-                    Remove(d, "Custom Office Templates");
-                    Remove(d, "Fiddler2");
-                    Remove(d, "IISExpress");
-                    Remove(d, "Mes fichiers reçus");
-                    Remove(d, "Modèles Office personnalisés");
-                    Remove(d, "My Received Files");
-                    Remove(d, "My Web Sites");
-                    Remove(d, "Outlook Files");
-                    Remove(d, "SQL Server Management Studio");
-                    Remove(d, "Visual Studio 2015");
-                    Remove(d, "Visual Studio 2017");
-                    Remove(d, "Visual Studio 2019");
-                    Remove(d, "WindowsPowerShell");
-                });
-
-            DoSomething(Path.Combine(userProfile, "Pictures"),
-                f => { }, d =>
-                {
-                    CheckEmptyFolder(d, "Camera Roll");
-                    CheckEmptyFolder(d, "Saved Pictures");
-
-                    Ignore(d, "Screenpresso");
-                });
-
-            DoSomething(Path.Combine(userProfile, "GoogleDrive"), f => { }, d =>
-            {
-                Ignore(d, "Checklist");
-                Ignore(d, "Documents");
-                Ignore(d, "Draft");
-                Ignore(d, "Images");
-                Ignore(d, "ok");
-                Ignore(d, "Projets");
-                Ignore(d, "TMP");
-
-                CheckHidden(d, ".tmp.drivedownload");
-            });
         }
 
         private static void RemovePattern(List<FileInfo> fileInfos, Regex pattern)
@@ -121,8 +113,8 @@ namespace CleanupUserProfile
             }
         }
 
-        private static void DoSomething(string folder, Action<List<FileInfo>> filesActions,
-            Action<List<DirectoryInfo>> directoriesActions)
+        private static void DoSomething(string folder, Action<List<FileInfo>> filesActions = null,
+            Action<List<DirectoryInfo>> directoriesActions = null)
         {
             void whatToDo(IEnumerable<FileSystemInfo> fileSystemInfos)
             {
@@ -139,14 +131,21 @@ namespace CleanupUserProfile
             }
 
             // files
-            var files = folderInfo.GetFiles().ToList();
-            Ignore(files, "Desktop.ini");
-            filesActions(files);
-            whatToDo(files);
+            if (filesActions != null)
+            {
+                var files = folderInfo.GetFiles().ToList();
+                Ignore(files, "Desktop.ini");
+                filesActions(files);
+                whatToDo(files);
+            }
+
             // dirs
-            var directories = folderInfo.GetDirectories().ToList();
-            directoriesActions(directories);
-            whatToDo(directories);
+            if (directoriesActions != null)
+            {
+                var directories = folderInfo.GetDirectories().ToList();
+                directoriesActions(directories);
+                whatToDo(directories);
+            }
         }
 
         private static void Remove(List<DirectoryInfo> fileSystemInfos, string name)
@@ -209,6 +208,26 @@ namespace CleanupUserProfile
         private static void Ignore<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
         {
             fileSystemInfos.TryGetAndRemove(name, out var fileToHide);
+        }
+
+        private static void SubDirectory<T>(List<T> fileSystemInfos, string name,
+            Action<List<FileInfo>> filesActions = null,
+            Action<List<DirectoryInfo>> directoriesActions = null) where T : FileSystemInfo
+        {
+            SubDirectory(fileSystemInfos, new[] {name}, filesActions, directoriesActions);
+        }
+
+        private static void SubDirectory<T>(List<T> fileSystemInfos, string[] names,
+            Action<List<FileInfo>> filesActions = null,
+            Action<List<DirectoryInfo>> directoriesActions = null) where T : FileSystemInfo
+        {
+            foreach (var name in names)
+            {
+                if (fileSystemInfos.TryGetAndRemove(name, out var subDirectory))
+                {
+                    DoSomething(subDirectory.FullName, filesActions, directoriesActions);
+                }
+            }
         }
 
         private static void CheckHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
