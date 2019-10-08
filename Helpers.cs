@@ -15,6 +15,7 @@ namespace CleanupUserProfile
             {
                 fi.Remove(result);
             }
+
             return result != null;
         }
 
@@ -25,6 +26,7 @@ namespace CleanupUserProfile
             {
                 fi.Remove(result);
             }
+
             return result != null;
         }
 
@@ -44,6 +46,16 @@ namespace CleanupUserProfile
             {
                 fi.Remove(t);
             }
+        }
+
+        public static T WithFlag<T>(this T value, T add)
+        {
+            return (T) (object) ((int) (object) value | (int) (object) add);
+        }
+
+        public static T WithoutFlag<T>(this T value, T remove)
+        {
+            return (T) (object) ((int) (object) value & ~(int) (object) remove);
         }
     }
 }

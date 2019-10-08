@@ -17,8 +17,10 @@ namespace CleanupUserProfile
                     // ignore ntuser.* files
                     f.RemoveAll(fn => fn.Name.StartsWith("ntuser.", StringComparison.InvariantCultureIgnoreCase));
 
+                    // yarn needs yarnrc to not be hidden to work, duh
+                    CheckNotHidden(f, ".yarnrc");
+
                     CheckHidden(f, ".gitconfig");
-                    CheckHidden(f, ".yarnrc");
                     CheckHidden(f, ".sqltools-setup");
                     CheckHidden(f, "_lesshst");
 
@@ -231,18 +233,29 @@ namespace CleanupUserProfile
         }
 
         private static void CheckHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
+            => ModifyFileAttributes(fileSystemInfos, name, a => a.WithFlag(FileAttributes.Hidden));
+
+        private static void CheckNotHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
+            => ModifyFileAttributes(fileSystemInfos, name, a => a.WithoutFlag(FileAttributes.Hidden));
+
+        private static void ModifyFileAttributes<T>(List<T> fileSystemInfos, string name,
+            Func<FileAttributes, FileAttributes> modifyAction) where T : FileSystemInfo
         {
-            if (fileSystemInfos.TryGetAndRemove(name, out var fileToHide))
+            if (fileSystemInfos.TryGetAndRemove(name, out var fileToModify))
             {
-                File.SetAttributes(fileToHide.FullName, FileAttributes.Hidden);
+                var attributes = File.GetAttributes(fileToModify.FullName);
+                var newAttributes = modifyAction(attributes);
+                File.SetAttributes(fileToModify.FullName, newAttributes);
             }
         }
 
         private static void CheckHidden<T>(List<T> fileSystemInfos, Regex namePattern) where T : FileSystemInfo
         {
-            while (fileSystemInfos.TryGetAndRemove(namePattern, out var fileToHide))
+            while (fileSystemInfos.TryGetAndRemove(namePattern, out var fileToModify))
             {
-                File.SetAttributes(fileToHide.FullName, FileAttributes.Hidden);
+                var attributes = File.GetAttributes(fileToModify.FullName);
+                var newAttributes = attributes.WithoutFlag(FileAttributes.Hidden);
+                File.SetAttributes(fileToModify.FullName, newAttributes);
             }
         }
     }
