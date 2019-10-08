@@ -254,7 +254,7 @@ namespace CleanupUserProfile
             while (fileSystemInfos.TryGetAndRemove(namePattern, out var fileToModify))
             {
                 var attributes = File.GetAttributes(fileToModify.FullName);
-                var newAttributes = attributes.WithoutFlag(FileAttributes.Hidden);
+                var newAttributes = attributes.WithFlag(FileAttributes.Hidden);
                 File.SetAttributes(fileToModify.FullName, newAttributes);
             }
         }
