@@ -21,6 +21,7 @@ namespace CleanupUserProfile
                     CheckNotHidden(f, ".yarnrc");
 
                     CheckHidden(f, ".gitconfig");
+                    CheckHidden(f, ".gitignore_global");
                     CheckHidden(f, ".sqltools-setup");
                     CheckHidden(f, "_lesshst");
 
