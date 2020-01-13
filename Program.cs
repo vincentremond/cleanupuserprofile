@@ -103,7 +103,6 @@ namespace CleanupUserProfile
                     CheckEmptyFolderAndHide(d, "Music");
                     CheckEmptyFolderAndHide(d, "3D Objects");
                     CheckEmptyFolderAndHide(d, "Contacts");
-                    CheckEmptyFolderAndHide(d, "Videos");
                     CheckEmptyFolderAndHide(d, "Saved Games");
 
                     SubDirectory(d, "Videos", vf => { }, vd => { CheckEmptyFolderAndRemove(vd, "Captures"); },
