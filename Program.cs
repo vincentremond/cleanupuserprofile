@@ -84,8 +84,8 @@ namespace CleanupUserProfile
                     Ignore(d, "OneDrive - FNAC");
                     SubDirectory(d, "Pictures", directoriesActions: pd =>
                     {
-                        CheckEmptyFolder(pd, "Camera Roll");
-                        CheckEmptyFolder(pd, "Saved Pictures");
+                        CheckEmptyFolderAndHide(pd, "Camera Roll");
+                        CheckEmptyFolderAndHide(pd, "Saved Pictures");
 
                         Ignore(pd, "Screenpresso");
                     });
@@ -190,16 +190,12 @@ namespace CleanupUserProfile
                     .GetFiles()
                     .Cast<FileSystemInfo>()
                     .Union(directory.GetDirectories())
+                    .Where(fsi => !IsDesktopIni(fsi))
                     .ToList();
 
                 empty = !files.Any();
                 foreach (var file in files)
                 {
-                    if (IsDesktopIni(file))
-                    {
-                        continue;
-                    }
-
                     Console.WriteLine($" Remove me : {file.FullName}");
                 }
 
@@ -212,10 +208,17 @@ namespace CleanupUserProfile
 
         private static void CheckEmptyFolderAndHide(List<DirectoryInfo> directories, string name)
         {
-            var directory = CheckEmptyFolder(directories, name);
-            if (directory != null)
+            var directory = CheckEmptyFolder(directories, name, out var empty);
+            if (directory != null && empty != null)
             {
-                File.SetAttributes(directory.FullName, FileAttributes.Hidden);
+                if (empty.Value)
+                {
+                    SetVisibility(directory, Hide);
+                }
+                else
+                {
+                    SetVisibility(directory, Show);
+                }
             }
         }
 
