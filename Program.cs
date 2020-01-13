@@ -100,11 +100,14 @@ namespace CleanupUserProfile
                     Remove(d, ".nx");
                     Remove(d, "source");
 
-                    CheckEmptyFolderAndHidden(d, "Music");
-                    CheckEmptyFolderAndHidden(d, "3D Objects");
-                    CheckEmptyFolderAndHidden(d, "Contacts");
-                    CheckEmptyFolderAndHidden(d, "Videos");
-                    CheckEmptyFolderAndHidden(d, "Saved Games");
+                    CheckEmptyFolderAndHide(d, "Music");
+                    CheckEmptyFolderAndHide(d, "3D Objects");
+                    CheckEmptyFolderAndHide(d, "Contacts");
+                    CheckEmptyFolderAndHide(d, "Videos");
+                    CheckEmptyFolderAndHide(d, "Saved Games");
+
+                    SubDirectory(d, "Videos", vf => { }, vd => { CheckEmptyFolderAndRemove(vd, "Captures"); },
+                        videoDirectory => SetVisibility(videoDirectory, Hide));
                 });
         }
 
@@ -177,12 +180,20 @@ namespace CleanupUserProfile
 
         private static DirectoryInfo CheckEmptyFolder(List<DirectoryInfo> directories, string name)
         {
+            return CheckEmptyFolder(directories, name, out _);
+        }
+
+        private static DirectoryInfo CheckEmptyFolder(List<DirectoryInfo> directories, string name, out bool? empty)
+        {
             if (directories.TryGetAndRemove(name, out var directory))
             {
                 var files = directory
                     .GetFiles()
                     .Cast<FileSystemInfo>()
-                    .Union(directory.GetDirectories());
+                    .Union(directory.GetDirectories())
+                    .ToList();
+
+                empty = !files.Any();
                 foreach (var file in files)
                 {
                     if (IsDesktopIni(file))
@@ -196,15 +207,25 @@ namespace CleanupUserProfile
                 return directory;
             }
 
+            empty = null;
             return null;
         }
 
-        private static void CheckEmptyFolderAndHidden(List<DirectoryInfo> directories, string name)
+        private static void CheckEmptyFolderAndHide(List<DirectoryInfo> directories, string name)
         {
             var directory = CheckEmptyFolder(directories, name);
             if (directory != null)
             {
                 File.SetAttributes(directory.FullName, FileAttributes.Hidden);
+            }
+        }
+
+        private static void CheckEmptyFolderAndRemove(List<DirectoryInfo> directories, string name)
+        {
+            var directory = CheckEmptyFolder(directories, name, out var empty);
+            if (directory != null && empty != null && empty.Value)
+            {
+                directory.Delete();
             }
         }
 
@@ -215,39 +236,61 @@ namespace CleanupUserProfile
 
         private static void SubDirectory<T>(List<T> fileSystemInfos, string name,
             Action<List<FileInfo>> filesActions = null,
-            Action<List<DirectoryInfo>> directoriesActions = null) where T : FileSystemInfo
+            Action<List<DirectoryInfo>> directoriesActions = null,
+            Action<T> subDirectoryAction = null) where T : FileSystemInfo
         {
-            SubDirectory(fileSystemInfos, new[] {name}, filesActions, directoriesActions);
+            SubDirectory(fileSystemInfos, new[] {name}, filesActions, directoriesActions, subDirectoryAction);
         }
 
         private static void SubDirectory<T>(List<T> fileSystemInfos, string[] names,
             Action<List<FileInfo>> filesActions = null,
-            Action<List<DirectoryInfo>> directoriesActions = null) where T : FileSystemInfo
+            Action<List<DirectoryInfo>> directoriesActions = null,
+            Action<T> subDirectoryAction = null) where T : FileSystemInfo
         {
             foreach (var name in names)
             {
                 if (fileSystemInfos.TryGetAndRemove(name, out var subDirectory))
                 {
                     DoSomething(subDirectory.FullName, filesActions, directoriesActions);
+                    if (subDirectoryAction != null)
+                    {
+                        subDirectoryAction(subDirectory);
+                    }
                 }
             }
         }
 
         private static void CheckHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
-            => ModifyFileAttributes(fileSystemInfos, name, a => a.WithFlag(FileAttributes.Hidden));
+            => ModifyFileAttributes(fileSystemInfos, name, Hide);
 
         private static void CheckNotHidden<T>(List<T> fileSystemInfos, string name) where T : FileSystemInfo
-            => ModifyFileAttributes(fileSystemInfos, name, a => a.WithoutFlag(FileAttributes.Hidden));
+            => ModifyFileAttributes(fileSystemInfos, name, Show);
+
+        private static FileAttributes Show(FileAttributes fileAttributes)
+        {
+            return fileAttributes.WithoutFlag(FileAttributes.Hidden);
+        }
+
+        private static FileAttributes Hide(FileAttributes fileAttributes)
+        {
+            return fileAttributes.WithFlag(FileAttributes.Hidden);
+        }
 
         private static void ModifyFileAttributes<T>(List<T> fileSystemInfos, string name,
             Func<FileAttributes, FileAttributes> modifyAction) where T : FileSystemInfo
         {
             if (fileSystemInfos.TryGetAndRemove(name, out var fileToModify))
             {
-                var attributes = File.GetAttributes(fileToModify.FullName);
-                var newAttributes = modifyAction(attributes);
-                File.SetAttributes(fileToModify.FullName, newAttributes);
+                SetVisibility(fileToModify, modifyAction);
             }
+        }
+
+        private static void SetVisibility<T>(T fileToModify, Func<FileAttributes, FileAttributes> modifyAction)
+            where T : FileSystemInfo
+        {
+            var attributes = File.GetAttributes(fileToModify.FullName);
+            var newAttributes = modifyAction(attributes);
+            File.SetAttributes(fileToModify.FullName, newAttributes);
         }
 
         private static void CheckHidden<T>(List<T> fileSystemInfos, Regex namePattern) where T : FileSystemInfo
