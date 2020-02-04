@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace CleanupUserProfile.Services
+namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IUserProfileCleaner
     {

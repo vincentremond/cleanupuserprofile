@@ -11,21 +11,7 @@ namespace CleanupUserProfile.Actions
         protected BaseAction(
             string pattern)
         {
-            if (pattern != null)
-            {
-                _pattern = ToRegex(pattern);
-            }
-        }
-
-        private Regex ToRegex(
-            string rule)
-        {
-            const string regexPrefix = "REGEX:";
-            var pattern = rule.StartsWith(regexPrefix, StringComparison.InvariantCultureIgnoreCase)
-                ? rule.Substring(regexPrefix.Length)
-                : $"^{Regex.Escape(rule)}$";
-
-            return new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            if (pattern != null) _pattern = ToRegex(pattern);
         }
 
         public bool IsMatch(
@@ -36,5 +22,44 @@ namespace CleanupUserProfile.Actions
 
         public abstract void Execute(
             FileSystemInfo file);
+
+        private static Regex ToRegex(
+            string rule)
+        {
+            const string regexPrefix = "REGEX:";
+            var pattern = rule.StartsWith(regexPrefix, StringComparison.InvariantCultureIgnoreCase)
+                ? rule.Substring(regexPrefix.Length)
+                : $"^{Regex.Escape(rule)}$";
+
+            return new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        }
+
+        protected static bool IsDesktopIni(
+            FileSystemInfo file)
+        {
+            return file is FileInfo x && x.Name.Equals("Desktop.ini", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        protected static void SetVisibility<T>(
+            T fileToModify,
+            Func<FileAttributes, FileAttributes> modifyAction)
+            where T : FileSystemInfo
+        {
+            var attributes = File.GetAttributes(fileToModify.FullName);
+            var newAttributes = modifyAction(attributes);
+            File.SetAttributes(fileToModify.FullName, newAttributes);
+        }
+
+        protected static FileAttributes Show(
+            FileAttributes fileAttributes)
+        {
+            return fileAttributes.WithoutFlag(FileAttributes.Hidden);
+        }
+
+        protected static FileAttributes Hide(
+            FileAttributes fileAttributes)
+        {
+            return fileAttributes.WithFlag(FileAttributes.Hidden);
+        }
     }
 }

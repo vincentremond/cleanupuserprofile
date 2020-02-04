@@ -2,11 +2,11 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal class CheckNotHiddenActionFactory : IActionFactory<CheckNotHiddenAction>
+    internal class CheckNotHiddenActionFactory : IActionFactory
     {
         public string ActionName => "CheckNotHidden";
 
-        public CheckNotHiddenAction GetAction(
+        public IAction GetAction(
             object value)
         {
             return new CheckNotHiddenAction(value as string);

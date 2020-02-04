@@ -11,10 +11,12 @@ namespace CleanupUserProfile.Config
         public string Remove { get; set; }
     }
 
+    [Serializable]
     internal class FileRule : GenericRule
     {
     }
 
+    [Serializable]
     internal class FolderRule : GenericRule
     {
         public string CheckEmptyFolder { get; set; }

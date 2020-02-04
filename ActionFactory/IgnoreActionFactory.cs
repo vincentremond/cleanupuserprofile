@@ -2,11 +2,11 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal class IgnoreActionFactory : IActionFactory<IgnoreAction>
+    internal class IgnoreActionFactory : IActionFactory
     {
         public string ActionName => "Ignore";
 
-        public IgnoreAction GetAction(
+        public IAction GetAction(
             object value)
         {
             return new IgnoreAction(value as string);

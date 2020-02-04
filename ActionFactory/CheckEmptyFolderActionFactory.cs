@@ -2,11 +2,11 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal class CheckEmptyFolderActionFactory : IActionFactory<CheckEmptyFolderAction>
+    internal class CheckEmptyFolderActionFactory : IActionFactory
     {
         public string ActionName => "CheckEmptyFolder";
 
-        public CheckEmptyFolderAction GetAction(
+        public IAction GetAction(
             object value)
         {
             return new CheckEmptyFolderAction(value as string);

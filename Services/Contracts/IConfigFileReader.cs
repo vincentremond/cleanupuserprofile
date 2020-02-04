@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CleanupUserProfile.Config;
 
-namespace CleanupUserProfile.Services
+namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IConfigFileReader
     {
