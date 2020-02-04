@@ -13,5 +13,6 @@ namespace CleanupUserProfile.Config
     internal class SubDirectory : Root
     {
         public string Name { get; set; }
+        public string SelfAction { get; set; }
     }
 }

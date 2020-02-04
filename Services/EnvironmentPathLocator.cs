@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 
 namespace CleanupUserProfile.Services
 {
     internal class EnvironmentPathLocator : IPathLocator
     {
-        public string GetUserProfile() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        public DirectoryInfo GetUserProfile() => new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
     }
 }

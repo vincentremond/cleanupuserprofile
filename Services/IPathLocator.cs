@@ -1,7 +1,9 @@
-﻿namespace CleanupUserProfile.Services
+﻿using System.IO;
+
+namespace CleanupUserProfile.Services
 {
     internal interface IPathLocator
     {
-        string GetUserProfile();
+        DirectoryInfo GetUserProfile();
     }
 }

@@ -1,10 +1,19 @@
-﻿namespace CleanupUserProfile.Actions
+﻿using System.IO;
+
+namespace CleanupUserProfile.Actions
 {
     internal class CheckHiddenAction : BaseAction
     {
         public CheckHiddenAction(
-            string matchCondition) : base(matchCondition)
+            string pattern) : base(pattern)
         {
+        }
+
+        public override void Execute(
+            FileSystemInfo file)
+        {
+            // TODO VRM
+            throw new System.NotImplementedException();
         }
     }
 }

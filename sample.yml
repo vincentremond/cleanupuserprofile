@@ -14,44 +14,44 @@ Folders:
   - CheckHidden: OpenVPN
   - Ignore: AppData
   - SubDirectory:
-    Name: Documents
-    Files:
-      - CheckHidden: Default.rdp
-    Folders:
-      - Ignore: GIT
-      - Ignore: Mes sources de données
-      - Remove: Custom Office Templates
-      - Remove: Fiddler2
-      - Remove: IISExpress
-      - Remove: Mes fichiers reçus
-      - Remove: Modèles Office personnalisés
-      - Remove: My Received Files
-      - Remove: My Web Sites
-      - Remove: Outlook Files
-      - Remove: SQL Server Management Studio
-      - Remove: Visual Studio 2015
-      - Remove: Visual Studio 2017
-      - Remove: Visual Studio 2019
-      - Remove: WindowsPowerShell
+      Name: Documents
+      Files:
+        - CheckHidden: Default.rdp
+      Folders:
+        - Ignore: GIT
+        - Ignore: Mes sources de données
+        - Remove: Custom Office Templates
+        - Remove: Fiddler2
+        - Remove: IISExpress
+        - Remove: Mes fichiers reçus
+        - Remove: Modèles Office personnalisés
+        - Remove: My Received Files
+        - Remove: My Web Sites
+        - Remove: Outlook Files
+        - Remove: SQL Server Management Studio
+        - Remove: Visual Studio 2015
+        - Remove: Visual Studio 2017
+        - Remove: Visual Studio 2019
+        - Remove: WindowsPowerShell
   - CheckHidden: Favorites
   - SubDirectory:
-    Name: REGEX:^Google\s*Drive$
-    Folders:
-      - Ignore: Checklist
-      - Ignore: Documents
-      - Ignore: Draft
-      - Ignore: Images
-      - Ignore: ok
-      - Ignore: Projets
-      - Ignore: TMP
-      - CheckHidden: .tmp.drivedownload
+      Name: REGEX:^Google\s*Drive$
+      Folders:
+        - Ignore: Checklist
+        - Ignore: Documents
+        - Ignore: Draft
+        - Ignore: Images
+        - Ignore: ok
+        - Ignore: Projets
+        - Ignore: TMP
+        - CheckHidden: .tmp.drivedownload
   - Ignore: OneDrive - FNAC
   - SubDirectory:
-    Name: Pictures
-    Folders:
-    - CheckEmptyFolderAndHide: Camera Roll
-    - CheckEmptyFolderAndHide: Saved Pictures
-    - Ignore: Screenpresso
+      Name: Pictures
+      Folders:
+      - CheckEmptyFolderAndHide: Camera Roll
+      - CheckEmptyFolderAndHide: Saved Pictures
+      - Ignore: Screenpresso
   - Ignore: Recent
   - CheckHidden: Searches
   - Ignore: repos
@@ -65,8 +65,7 @@ Folders:
   - CheckEmptyFolderAndHide: Contacts
   - CheckEmptyFolderAndHide: Saved Games
   - SubDirectory:
-    Name: Videos
-    SelfAction: CheckHidden
-    Folders: 
-    - CheckEmptyFolderAndHide: Captures
-                        videoDirectory => SetVisibility(videoDirectory, Hide));
+      Name: Videos
+      SelfAction: CheckHidden
+      Folders: 
+      - CheckEmptyFolderAndHide: Captures
