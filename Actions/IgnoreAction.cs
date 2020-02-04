@@ -1,9 +1,16 @@
-﻿namespace CleanupUserProfile.Actions
+﻿using System.IO;
+
+namespace CleanupUserProfile.Actions
 {
     internal class IgnoreAction : BaseAction
     {
         public IgnoreAction(
-            string value) : base(value)
+            string pattern) : base(pattern)
+        {
+        }
+
+        public override void Execute(
+            FileSystemInfo file)
         {
         }
     }
