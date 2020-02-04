@@ -20,22 +20,13 @@ namespace CleanupUserProfile
                     // yarn needs yarnrc to not be hidden to work, duh
                     CheckNotHidden(f, ".yarnrc");
 
-                    CheckHidden(f, ".gitconfig");
-                    CheckHidden(f, ".gitignore_global");
-                    CheckHidden(f, ".sqltools-setup");
-                    CheckHidden(f, "_lesshst");
+                    CheckHidden(f, new Regex(@"^[_\.][\w\d\.-]+$", RegexOptions.IgnoreCase));
 
-                    Remove(f, ".bash_history");
-                    Remove(f, ".csslintrc");
-                    Remove(f, ".eslintrc");
-                    Remove(f, ".minttyrc");
-                    Remove(f, ".node_repl_history");
-                    Remove(f, ".rnd");
-                    Remove(f, ".viminfo");
                     Remove(f, "coffeelint.json");
                     Remove(f, "tslint.json");
 
                     RemovePattern(f, new Regex(@"^\.v8flags\..+\.json$", RegexOptions.IgnoreCase));
+                    RemovePattern(f, new Regex(@"^tmp[\w\d\.-]+.pem$", RegexOptions.IgnoreCase));
                 },
                 d =>
                 {
@@ -105,7 +96,7 @@ namespace CleanupUserProfile
                     CheckEmptyFolderAndHide(d, "Contacts");
                     CheckEmptyFolderAndHide(d, "Saved Games");
 
-                    SubDirectory(d, "Videos", vf => { }, vd => { CheckEmptyFolderAndRemove(vd, "Captures"); },
+                    SubDirectory(d, "Videos", vf => { }, vd => { CheckEmptyFolderAndHide(vd, "Captures"); },
                         videoDirectory => SetVisibility(videoDirectory, Hide));
                 });
         }
