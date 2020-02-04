@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 
 namespace CleanupUserProfile.Actions
 {
@@ -10,10 +12,30 @@ namespace CleanupUserProfile.Actions
         }
 
         public override void Execute(
-            FileSystemInfo file)
+            FileSystemInfo fileSystemInfo)
         {
-            // TODO VRM
-            throw new System.NotImplementedException();
+            switch (fileSystemInfo)
+            {
+                case FileInfo file:
+                {
+                    file.Delete();
+                    break;
+                }
+                case DirectoryInfo directory:
+                {
+                    directory
+                        .GetFiles("*", SearchOption.AllDirectories)
+                        .ToList()
+                        .ForEach(f => f.Attributes = FileAttributes.Normal);
+                    directory
+                        .GetFiles("*", SearchOption.AllDirectories)
+                        .ToList()
+                        .ForEach(f => f.Delete());
+                    directory.Delete(true);
+                    break;
+                }
+                default: throw new ApplicationException();
+            }
         }
     }
 }

@@ -12,8 +12,7 @@ namespace CleanupUserProfile.Actions
         public override void Execute(
             FileSystemInfo file)
         {
-            // TODO VRM
-            throw new System.NotImplementedException();
+            SetVisibility(file, Hide);
         }
     }
 }

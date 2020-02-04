@@ -1,9 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using CleanupUserProfile.Config;
+using CleanupUserProfile.Services.Contracts;
 using YamlDotNet.Serialization;
 
-namespace CleanupUserProfile.Services
+namespace CleanupUserProfile.Services.Impl
 {
     internal class ConfigFileReader : IConfigFileReader
     {

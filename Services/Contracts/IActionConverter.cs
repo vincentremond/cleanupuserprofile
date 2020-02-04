@@ -2,7 +2,7 @@
 using CleanupUserProfile.Actions;
 using CleanupUserProfile.Config;
 
-namespace CleanupUserProfile.Services
+namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IActionConverter
     {

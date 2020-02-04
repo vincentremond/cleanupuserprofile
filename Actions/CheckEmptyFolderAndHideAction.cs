@@ -2,18 +2,18 @@
 
 namespace CleanupUserProfile.Actions
 {
-    internal class CheckEmptyFolderAndHideAction : BaseAction
+    internal class CheckEmptyFolderAndHideAction : CheckEmptyFolderAction
     {
         public CheckEmptyFolderAndHideAction(
             string pattern) : base(pattern)
         {
         }
 
-        public override void Execute(
-            FileSystemInfo file)
+        protected override void Execute(
+            DirectoryInfo directory)
         {
-            // TODO VRM
-            throw new System.NotImplementedException();
+            base.Execute(directory);
+            SetVisibility(directory, Hide);
         }
     }
 }

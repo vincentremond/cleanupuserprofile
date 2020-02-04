@@ -1,19 +1,27 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 
 namespace CleanupUserProfile.Actions
 {
-    internal class CheckEmptyFolderAction : BaseAction
+    internal class CheckEmptyFolderAction : BaseDirectoryAction
     {
         public CheckEmptyFolderAction(
             string pattern) : base(pattern)
         {
         }
 
-        public override void Execute(
-            FileSystemInfo file)
+        protected override void Execute(
+            DirectoryInfo directory)
         {
-            // TODO VRM
-            throw new System.NotImplementedException();
+            var files = directory
+                .GetFiles()
+                .Cast<FileSystemInfo>()
+                .Union(directory.GetDirectories())
+                .Where(fsi => !IsDesktopIni(fsi))
+                .ToList();
+
+            foreach (var file in files) Console.WriteLine($" Remove me : {file.FullName}");
         }
     }
 }

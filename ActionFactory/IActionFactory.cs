@@ -2,11 +2,11 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal interface IActionFactory<out T> where T : IAction
+    internal interface IActionFactory
     {
         string ActionName { get; }
 
-        T GetAction(
+        IAction GetAction(
             object value);
     }
 }

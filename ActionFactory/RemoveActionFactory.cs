@@ -2,11 +2,11 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal class RemoveActionFactory : IActionFactory<RemoveAction>
+    internal class RemoveActionFactory : IActionFactory
     {
         public string ActionName => "Remove";
 
-        public RemoveAction GetAction(
+        public IAction GetAction(
             object value)
         {
             return new RemoveAction(value as string);

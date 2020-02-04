@@ -2,9 +2,9 @@
 
 namespace CleanupUserProfile.Actions
 {
-    internal class CheckNotHiddenAction : BaseAction
+    internal abstract class BaseDirectoryAction : BaseAction
     {
-        public CheckNotHiddenAction(
+        protected BaseDirectoryAction(
             string pattern) : base(pattern)
         {
         }
@@ -12,7 +12,10 @@ namespace CleanupUserProfile.Actions
         public override void Execute(
             FileSystemInfo file)
         {
-            SetVisibility(file, Show);
+            Execute(file as DirectoryInfo);
         }
+
+        protected abstract void Execute(
+            DirectoryInfo file);
     }
 }
