@@ -1,0 +1,72 @@
+Files:
+  - Ignore: REGEX:^ntuser\.
+  - CheckNotHidden: .yarnrc
+  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+  - Remove: coffeelint.json
+  - Remove: tslint.json
+  - Remove: REGEX:^\.v8flags\..+\.json
+  - Remove: REGEX:^tmp[\w\d\.-]+.pem
+Folders:
+  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+  - CheckHidden: IntelGraphicsProfiles
+  - CheckHidden: Links
+  - CheckHidden: MicrosoftEdgeBackups
+  - CheckHidden: OpenVPN
+  - Ignore: AppData
+  - SubDirectory:
+    Name: Documents
+    Files:
+      - CheckHidden: Default.rdp
+    Folders:
+      - Ignore: GIT
+      - Ignore: Mes sources de données
+      - Remove: Custom Office Templates
+      - Remove: Fiddler2
+      - Remove: IISExpress
+      - Remove: Mes fichiers reçus
+      - Remove: Modèles Office personnalisés
+      - Remove: My Received Files
+      - Remove: My Web Sites
+      - Remove: Outlook Files
+      - Remove: SQL Server Management Studio
+      - Remove: Visual Studio 2015
+      - Remove: Visual Studio 2017
+      - Remove: Visual Studio 2019
+      - Remove: WindowsPowerShell
+  - CheckHidden: Favorites
+  - SubDirectory:
+    Name: REGEX:^Google\s*Drive$
+    Folders:
+      - Ignore: Checklist
+      - Ignore: Documents
+      - Ignore: Draft
+      - Ignore: Images
+      - Ignore: ok
+      - Ignore: Projets
+      - Ignore: TMP
+      - CheckHidden: .tmp.drivedownload
+  - Ignore: OneDrive - FNAC
+  - SubDirectory:
+    Name: Pictures
+    Folders:
+    - CheckEmptyFolderAndHide: Camera Roll
+    - CheckEmptyFolderAndHide: Saved Pictures
+    - Ignore: Screenpresso
+  - Ignore: Recent
+  - CheckHidden: Searches
+  - Ignore: repos
+  - Ignore: Wallpapers
+  - CheckEmptyFolder: Desktop
+  - CheckEmptyFolder: Downloads
+  - Remove: .nx
+  - Remove: source
+  - CheckEmptyFolderAndHide: Music
+  - CheckEmptyFolderAndHide: 3D Objects
+  - CheckEmptyFolderAndHide: Contacts
+  - CheckEmptyFolderAndHide: Saved Games
+  - SubDirectory:
+    Name: Videos
+    SelfAction: CheckHidden
+    Folders: 
+    - CheckEmptyFolderAndHide: Captures
+                        videoDirectory => SetVisibility(videoDirectory, Hide));

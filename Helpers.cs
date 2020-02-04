@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace CleanupUserProfile
 {
-    public static class Helpers
+    internal static class Helpers
     {
         public static bool TryGetAndRemove<T>(this List<T> fi, string name, out T result) where T : FileSystemInfo
         {
