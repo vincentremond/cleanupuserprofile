@@ -8,15 +8,15 @@ namespace CleanupUserProfile.Actions
     internal class DirectoryAction : BaseAction
     {
         private readonly IEnumerable<IAction> _filesActions;
-        private readonly IEnumerable<IAction> _foldersActions;
+        private readonly IEnumerable<IAction> _directoriesActions;
 
         public DirectoryAction(
             IEnumerable<IAction> filesActions,
-            IEnumerable<IAction> foldersActions,
+            IEnumerable<IAction> directoriesActions,
             string pattern = null) : base(pattern)
         {
             _filesActions = filesActions;
-            _foldersActions = foldersActions;
+            _directoriesActions = directoriesActions;
         }
 
         public override void Execute(
@@ -24,10 +24,10 @@ namespace CleanupUserProfile.Actions
         {
             if (!fileSystemInfo.Exists) return;
 
-            if (!(fileSystemInfo is DirectoryInfo folderInfo)) return;
+            if (!(fileSystemInfo is DirectoryInfo directoryInfo)) return;
 
-            PerformActions(_filesActions, folderInfo.GetFiles());
-            PerformActions(_foldersActions, folderInfo.GetDirectories());
+            PerformActions(_filesActions, directoryInfo.GetFiles());
+            PerformActions(_directoriesActions, directoryInfo.GetDirectories());
         }
 
         private static void PerformActions(

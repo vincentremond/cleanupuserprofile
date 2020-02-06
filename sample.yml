@@ -6,7 +6,7 @@ Files:
   - Remove: tslint.json
   - Remove: REGEX:^\.v8flags\..+\.json
   - Remove: REGEX:^tmp[\w\d\.-]+.pem
-Folders:
+Directories:
   - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
   - CheckHidden: IntelGraphicsProfiles
   - CheckHidden: Links
@@ -17,7 +17,7 @@ Folders:
       Name: Documents
       Files:
         - CheckHidden: Default.rdp
-      Folders:
+      Directories:
         - Ignore: GIT
         - Ignore: Mes sources de données
         - Remove: Custom Office Templates
@@ -36,7 +36,7 @@ Folders:
   - CheckHidden: Favorites
   - SubDirectory:
       Name: REGEX:^Google\s*Drive$
-      Folders:
+      Directories:
         - Ignore: Checklist
         - Ignore: Documents
         - Ignore: Draft
@@ -48,24 +48,23 @@ Folders:
   - Ignore: OneDrive - FNAC
   - SubDirectory:
       Name: Pictures
-      Folders:
-      - CheckEmptyFolderAndHide: Camera Roll
-      - CheckEmptyFolderAndHide: Saved Pictures
+      Directories:
+      - CheckEmptyDirectoryAndHide: Camera Roll
+      - CheckEmptyDirectoryAndHide: Saved Pictures
       - Ignore: Screenpresso
   - Ignore: Recent
   - CheckHidden: Searches
   - Ignore: repos
   - Ignore: Wallpapers
-  - CheckEmptyFolder: Desktop
-  - CheckEmptyFolder: Downloads
-  - Remove: .nx
+  - CheckEmptyDirectory: Desktop
+  - CheckEmptyDirectory: Downloads
   - Remove: source
-  - CheckEmptyFolderAndHide: Music
-  - CheckEmptyFolderAndHide: 3D Objects
-  - CheckEmptyFolderAndHide: Contacts
-  - CheckEmptyFolderAndHide: Saved Games
+  - CheckEmptyDirectoryAndHide: Music
+  - CheckEmptyDirectoryAndHide: 3D Objects
+  - CheckEmptyDirectoryAndHide: Contacts
+  - CheckEmptyDirectoryAndHide: Saved Games
   - SubDirectory:
       Name: Videos
       SelfAction: CheckHidden
-      Folders: 
-      - CheckEmptyFolderAndHide: Captures
+      Directories: 
+      - CheckEmptyDirectoryAndHide: Captures

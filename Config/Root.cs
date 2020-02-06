@@ -6,7 +6,7 @@ namespace CleanupUserProfile.Config
     internal class Root
     {
         public FileRule[] Files { get; set; }
-        public FolderRule[] Folders { get; set; }
+        public DirectoryRule[] Directories { get; set; }
     }
 
     [Serializable]

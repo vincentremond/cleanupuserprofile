@@ -27,8 +27,8 @@ namespace CleanupUserProfile.Services.Impl
             var config = await _configFileReader.ReadConfigFileAsync(configFilePath);
 
             var filesActions = _actionConverter.Convert(config.Files);
-            var foldersActions = _actionConverter.Convert(config.Folders);
-            var cleanup = new DirectoryAction(filesActions, foldersActions);
+            var directoriesActions = _actionConverter.Convert(config.Directories);
+            var cleanup = new DirectoryAction(filesActions, directoriesActions);
             cleanup.Execute(userProfile);
         }
     }

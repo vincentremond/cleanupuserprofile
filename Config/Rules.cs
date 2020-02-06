@@ -17,10 +17,10 @@ namespace CleanupUserProfile.Config
     }
 
     [Serializable]
-    internal class FolderRule : GenericRule
+    internal class DirectoryRule : GenericRule
     {
-        public string CheckEmptyFolder { get; set; }
-        public string CheckEmptyFolderAndHide { get; set; }
+        public string CheckEmptyDirectory { get; set; }
+        public string CheckEmptyDirectoryAndHide { get; set; }
         public SubDirectory SubDirectory { get; set; }
     }
 }

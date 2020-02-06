@@ -19,8 +19,8 @@ namespace CleanupUserProfile
 
             serviceProvider.AddTransient<IActionFactory, CheckHiddenActionFactory>();
             serviceProvider.AddTransient<IActionFactory, CheckNotHiddenActionFactory>();
-            serviceProvider.AddTransient<IActionFactory, CheckEmptyFolderActionFactory>();
-            serviceProvider.AddTransient<IActionFactory, CheckEmptyFolderAndHideActionFactory>();
+            serviceProvider.AddTransient<IActionFactory, CheckEmptyDirectoryActionFactory>();
+            serviceProvider.AddTransient<IActionFactory, CheckEmptyDirectoryAndHideActionFactory>();
             serviceProvider.AddTransient<IActionFactory, IgnoreActionFactory>();
             serviceProvider.AddTransient<IActionFactory, RemoveActionFactory>();
             serviceProvider.AddTransient<IActionFactory, DirectoryActionFactory>();
