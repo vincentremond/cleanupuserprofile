@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace CleanupUserProfile.Actions
 {
-    internal class CheckEmptyFolderAction : BaseDirectoryAction
+    internal class CheckEmptyDirectoryAction : BaseDirectoryAction
     {
-        public CheckEmptyFolderAction(
+        public CheckEmptyDirectoryAction(
             string pattern) : base(pattern)
         {
         }

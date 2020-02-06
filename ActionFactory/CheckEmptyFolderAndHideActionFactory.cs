@@ -2,14 +2,14 @@
 
 namespace CleanupUserProfile.ActionFactory
 {
-    internal class CheckEmptyFolderAndHideActionFactory : IActionFactory
+    internal class CheckEmptyDirectoryAndHideActionFactory : IActionFactory
     {
-        public string ActionName => "CheckEmptyFolderAndHide";
+        public string ActionName => "CheckEmptyDirectoryAndHide";
 
         public IAction GetAction(
             object value)
         {
-            return new CheckEmptyFolderAndHideAction(value as string);
+            return new CheckEmptyDirectoryAndHideAction(value as string);
         }
     }
 }

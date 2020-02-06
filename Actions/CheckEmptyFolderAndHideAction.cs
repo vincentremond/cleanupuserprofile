@@ -2,9 +2,9 @@
 
 namespace CleanupUserProfile.Actions
 {
-    internal class CheckEmptyFolderAndHideAction : CheckEmptyFolderAction
+    internal class CheckEmptyDirectoryAndHideAction : CheckEmptyDirectoryAction
     {
-        public CheckEmptyFolderAndHideAction(
+        public CheckEmptyDirectoryAndHideAction(
             string pattern) : base(pattern)
         {
         }
