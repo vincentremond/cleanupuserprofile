@@ -21,6 +21,11 @@ namespace CleanupUserProfile.Services.Impl
         public IEnumerable<IAction> Convert(
             IEnumerable<GenericRule> configFiles)
         {
+            if (configFiles == null)
+            {
+                return new List<IAction>(0);
+            }
+
             return configFiles
                 .Select(ConvertSingle)
                 .ToList();
