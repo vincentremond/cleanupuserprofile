@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using CleanupUserProfile.Actions;
 using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Services.Impl
@@ -23,13 +22,10 @@ namespace CleanupUserProfile.Services.Impl
         public async Task CleanupAsync(
             string configFilePath)
         {
-            var userProfile = _pathLocator.GetUserProfile();
             var config = await _configFileReader.ReadConfigFileAsync(configFilePath);
-
-            var filesActions = _actionConverter.Convert(config.Files);
-            var directoriesActions = _actionConverter.Convert(config.Directories);
-            var cleanup = new DirectoryAction(filesActions, directoriesActions);
-            cleanup.Execute(userProfile);
+            var directoryCleanupAction = _actionConverter.GetDirectoryAction(config.Files, config.Directories);
+            var userProfile = _pathLocator.GetUserProfile();
+            directoryCleanupAction.Execute(userProfile);
         }
     }
 }

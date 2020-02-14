@@ -9,7 +9,7 @@ namespace CleanupUserProfile
     {
         // ReSharper disable once UnusedMember.Local
         private static async Task Main(
-            string configFile = "sample.yml")
+            string configFile = "..\\..\\..\\..\\..\\sample.yml")
         {
             var serviceProvider = ApplicationInitializer.Init();
             var userProfileCleaner = serviceProvider.GetRequiredService<IUserProfileCleaner>();

@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using CleanupUserProfile.Actions;
+﻿using CleanupUserProfile.Actions;
 using CleanupUserProfile.Config;
 
 namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IActionConverter
     {
-        IEnumerable<IAction> Convert(
-            IEnumerable<GenericRule> configFiles);
+        DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories, string subDirectoryPattern = null);
     }
 }
