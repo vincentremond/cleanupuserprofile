@@ -65,6 +65,5 @@ Directories:
   - CheckEmptyDirectoryAndHide: Saved Games
   - SubDirectory:
       Name: Videos
-      SelfAction: CheckHidden
       Directories: 
       - CheckEmptyDirectoryAndHide: Captures
