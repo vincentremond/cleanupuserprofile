@@ -22,9 +22,15 @@ namespace CleanupUserProfile.Actions
         public override void Execute(
             FileSystemInfo fileSystemInfo)
         {
-            if (!fileSystemInfo.Exists) return;
+            if (!fileSystemInfo.Exists)
+            {
+                return;
+            }
 
-            if (!(fileSystemInfo is DirectoryInfo directoryInfo)) return;
+            if (!(fileSystemInfo is DirectoryInfo directoryInfo))
+            {
+                return;
+            }
 
             PerformActions(_filesActions, directoryInfo.GetFiles());
             PerformActions(_directoriesActions, directoryInfo.GetDirectories());
