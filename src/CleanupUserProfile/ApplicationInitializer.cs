@@ -24,6 +24,7 @@ namespace CleanupUserProfile
             serviceProvider.AddTransient<IActionFactory, IgnoreActionFactory>();
             serviceProvider.AddTransient<IActionFactory, RemoveActionFactory>();
             serviceProvider.AddTransient<IActionFactory, DirectoryActionFactory>();
+            serviceProvider.AddTransient<IActionFactory, RemoveSymbolicLinkActionFactory>();
 
             serviceProvider.AddLogging(builder => builder.AddConsole());
 

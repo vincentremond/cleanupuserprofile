@@ -18,7 +18,7 @@ namespace CleanupUserProfile.Services.Impl
             _actionFactories = actionFactories;
         }
 
-        public IEnumerable<IAction> Convert(
+        public IList<IAction> Convert(
             IEnumerable<GenericRule> configFiles)
         {
             if (configFiles == null)
@@ -31,9 +31,11 @@ namespace CleanupUserProfile.Services.Impl
                 .ToList();
         }
 
-        public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories, string subDirectoryName = null)
+        public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories,
+            string subDirectoryName = null)
         {
             var filesActions = Convert(configFiles);
+            filesActions.Add(new IgnoreAction("desktop.ini"));
             var directoriesActions = Convert(configDirectories);
             return new DirectoryAction(filesActions, directoriesActions, subDirectoryName);
         }

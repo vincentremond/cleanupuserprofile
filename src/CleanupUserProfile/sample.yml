@@ -13,6 +13,28 @@ Directories:
   - CheckHidden: MicrosoftEdgeBackups
   - CheckHidden: OpenVPN
   - Ignore: AppData
+  - Ignore: Qa
+  - RemoveSymbolicLink: Application Data
+  - RemoveSymbolicLink: Cookies
+  - RemoveSymbolicLink: Local Settings
+  - RemoveSymbolicLink: Menu Démarrer
+  - RemoveSymbolicLink: Mes documents
+  - RemoveSymbolicLink: Modèles
+  - RemoveSymbolicLink: SendTo
+  - RemoveSymbolicLink: Voisinage d'impression
+  - RemoveSymbolicLink: Voisinage réseau
+  - Ignore: OneDrive - FNAC
+  - CheckHidden: Favorites
+  - Ignore: Recent
+  - CheckHidden: Searches
+  - Ignore: repos
+  - Ignore: Wallpapers
+  - CheckEmptyDirectory: Downloads
+  - Remove: source
+  - CheckEmptyDirectoryAndHide: Music
+  - CheckEmptyDirectoryAndHide: 3D Objects
+  - CheckEmptyDirectoryAndHide: Contacts
+  - CheckEmptyDirectoryAndHide: Saved Games
   - SubDirectory:
       Name: Documents
       Files:
@@ -20,6 +42,11 @@ Directories:
       Directories:
         - Ignore: GIT
         - Ignore: Mes sources de données
+        - Ignore: WindowsPowerShell
+        - RemoveSymbolicLink: Ma musique 
+        - RemoveSymbolicLink: Mes images 
+        - RemoveSymbolicLink: Mes vidéos 
+        - Remove: Downloads
         - Remove: Custom Office Templates
         - Remove: Fiddler2
         - Remove: IISExpress
@@ -32,8 +59,6 @@ Directories:
         - Remove: Visual Studio 2015
         - Remove: Visual Studio 2017
         - Remove: Visual Studio 2019
-        - Remove: WindowsPowerShell
-  - CheckHidden: Favorites
   - SubDirectory:
       Name: REGEX:^Google\s*Drive$
       Directories:
@@ -45,25 +70,18 @@ Directories:
         - Ignore: Projets
         - Ignore: TMP
         - CheckHidden: .tmp.drivedownload
-  - Ignore: OneDrive - FNAC
   - SubDirectory:
       Name: Pictures
       Directories:
       - CheckEmptyDirectoryAndHide: Camera Roll
       - CheckEmptyDirectoryAndHide: Saved Pictures
+      - CheckEmptyDirectoryAndHide: Screenshots 
       - Ignore: Screenpresso
-  - Ignore: Recent
-  - CheckHidden: Searches
-  - Ignore: repos
-  - Ignore: Wallpapers
-  - CheckEmptyDirectory: Desktop
-  - CheckEmptyDirectory: Downloads
-  - Remove: source
-  - CheckEmptyDirectoryAndHide: Music
-  - CheckEmptyDirectoryAndHide: 3D Objects
-  - CheckEmptyDirectoryAndHide: Contacts
-  - CheckEmptyDirectoryAndHide: Saved Games
   - SubDirectory:
       Name: Videos
       Directories: 
       - CheckEmptyDirectoryAndHide: Captures
+  - SubDirectory:
+      Name: Desktop
+      Files:
+      - Remove: REGEX:\.lnk$
