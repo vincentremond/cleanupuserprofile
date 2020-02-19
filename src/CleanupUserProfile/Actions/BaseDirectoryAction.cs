@@ -4,18 +4,15 @@ namespace CleanupUserProfile.Actions
 {
     internal abstract class BaseDirectoryAction : BaseAction
     {
-        protected BaseDirectoryAction(
-            string pattern) : base(pattern)
+        protected BaseDirectoryAction(string pattern) : base(pattern)
         {
         }
 
-        public override void Execute(
-            FileSystemInfo file)
+        public override void Execute(FileSystemInfo file)
         {
             Execute(file as DirectoryInfo);
         }
 
-        protected abstract void Execute(
-            DirectoryInfo file);
+        protected abstract void Execute(DirectoryInfo file);
     }
 }
