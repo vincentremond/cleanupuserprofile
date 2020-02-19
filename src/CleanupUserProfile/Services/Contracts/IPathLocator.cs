@@ -4,6 +4,6 @@ namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IPathLocator
     {
-        DirectoryInfo GetUserProfile();
+        DirectoryInfo Locate(string directoryName);
     }
 }

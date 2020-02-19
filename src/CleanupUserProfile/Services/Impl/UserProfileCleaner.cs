@@ -1,5 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using CleanupUserProfile.Actions;
 using CleanupUserProfile.Services.Contracts;
+using Directory = CleanupUserProfile.Config.Directory;
 
 namespace CleanupUserProfile.Services.Impl
 {
@@ -22,9 +26,48 @@ namespace CleanupUserProfile.Services.Impl
         public async Task CleanupAsync(string configFilePath)
         {
             var config = await _configFileReader.ReadConfigFileAsync(configFilePath);
-            var directoryCleanupAction = _actionConverter.GetDirectoryAction(config.Files, config.Directories);
-            var userProfile = _pathLocator.GetUserProfile();
-            directoryCleanupAction.Execute(userProfile);
+            var directoriesInfo = GetDirectoriesInfo(config);
+            var directoriesActions = GetDirectoriesActions(directoriesInfo);
+            PerformCleanup(directoriesActions);
+        }
+
+        private static void PerformCleanup(List<(DirectoryInfo, DirectoryAction)> directoriesActions)
+        {
+            foreach (var (directoryInfo, directoryCleanupAction) in directoriesActions)
+            {
+                if (!directoryInfo.Exists)
+                {
+                    continue;
+                }
+
+                directoryCleanupAction.Execute(directoryInfo);
+            }
+        }
+
+        private List<(DirectoryInfo, DirectoryAction)> GetDirectoriesActions(
+            IEnumerable<(DirectoryInfo, Directory)> directoriesInfo)
+        {
+            var result = new List<(DirectoryInfo, DirectoryAction)>();
+            foreach (var (directoryInfo, directory) in directoriesInfo)
+            {
+                var directoryCleanupActions =
+                    _actionConverter.GetDirectoryAction(directory.Files, directory.Directories);
+                result.Add((directoryInfo, directoryCleanupActions));
+            }
+
+            return result;
+        }
+
+        private IEnumerable<(DirectoryInfo, Directory)> GetDirectoriesInfo(IEnumerable<Directory> config)
+        {
+            var result = new List<(DirectoryInfo, Directory)>();
+            foreach (var directory in config)
+            {
+                var info = _pathLocator.Locate(directory.Name);
+                result.Add((info, directory));
+            }
+
+            return result;
         }
     }
 }
