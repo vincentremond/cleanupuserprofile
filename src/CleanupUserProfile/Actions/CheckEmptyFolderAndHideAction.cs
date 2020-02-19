@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace CleanupUserProfile.Actions
 {
@@ -13,7 +14,11 @@ namespace CleanupUserProfile.Actions
             DirectoryInfo directory)
         {
             base.Execute(directory);
-            SetVisibility(directory, Hide);
+
+            if (SetVisibility(directory, Hide))
+            {
+                Console.WriteLine($" Hidden : {directory.FullName}");
+            }
         }
     }
 }

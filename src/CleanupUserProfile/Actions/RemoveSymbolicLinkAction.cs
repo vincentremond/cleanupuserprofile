@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace CleanupUserProfile.Actions
 {
@@ -12,6 +13,7 @@ namespace CleanupUserProfile.Actions
             DirectoryInfo directory)
         {
             directory.Delete(false);
+            Console.WriteLine($" Removed : {directory.FullName}");
         }
     }
 }

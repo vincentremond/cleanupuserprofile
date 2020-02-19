@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace CleanupUserProfile.Actions
 {
@@ -12,7 +13,10 @@ namespace CleanupUserProfile.Actions
         public override void Execute(
             FileSystemInfo file)
         {
-            SetVisibility(file, Hide);
+            if (SetVisibility(file, Hide))
+            {
+                Console.WriteLine($" Hidden : {file.FullName}");
+            }
         }
     }
 }

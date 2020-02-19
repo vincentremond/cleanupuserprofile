@@ -11,27 +11,32 @@ namespace CleanupUserProfile.Actions
         {
         }
 
-        public override void Execute(
-            FileSystemInfo fileSystemInfo)
+        public override void Execute(FileSystemInfo fileSystemInfo)
         {
             switch (fileSystemInfo)
             {
                 case FileInfo file:
                 {
                     file.Delete();
+                    Console.WriteLine($" Removed : {file.FullName}");
+
                     break;
                 }
                 case DirectoryInfo directory:
                 {
-                    directory
+                    var files = directory
                         .GetFiles("*", SearchOption.AllDirectories)
-                        .ToList()
-                        .ForEach(f => f.Attributes = FileAttributes.Normal);
-                    directory
-                        .GetFiles("*", SearchOption.AllDirectories)
-                        .ToList()
-                        .ForEach(f => f.Delete());
+                        .ToList();
+                    foreach (var f in files)
+                    {
+                        f.Attributes = FileAttributes.Normal;
+                        f.Delete();
+                        Console.WriteLine($" Removed : {f.FullName}");
+                    }
+
                     directory.Delete(true);
+                    Console.WriteLine($" Removed : {directory.FullName}");
+
                     break;
                 }
                 default: throw new ApplicationException();

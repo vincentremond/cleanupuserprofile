@@ -21,7 +21,10 @@ namespace CleanupUserProfile.Actions
                 .Where(fsi => !IsDesktopIni(fsi))
                 .ToList();
 
-            foreach (var file in files) Console.WriteLine($" Remove me : {file.FullName}");
+            foreach (var file in files)
+            {
+                Console.WriteLine($" Remove me : {file.FullName}");
+            }
         }
     }
 }
