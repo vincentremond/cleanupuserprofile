@@ -1,87 +1,119 @@
-Files:
-  - Ignore: REGEX:^ntuser\.
-  - CheckNotHidden: .yarnrc
-  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
-  - Remove: coffeelint.json
-  - Remove: tslint.json
-  - Remove: REGEX:^\.v8flags\..+\.json
-  - Remove: REGEX:^tmp[\w\d\.-]+.pem
-Directories:
-  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
-  - CheckHidden: IntelGraphicsProfiles
-  - CheckHidden: Links
-  - CheckHidden: MicrosoftEdgeBackups
-  - CheckHidden: OpenVPN
-  - Ignore: AppData
-  - Ignore: Qa
-  - RemoveSymbolicLink: Application Data
-  - RemoveSymbolicLink: Cookies
-  - RemoveSymbolicLink: Local Settings
-  - RemoveSymbolicLink: Menu Démarrer
-  - RemoveSymbolicLink: Mes documents
-  - RemoveSymbolicLink: Modèles
-  - RemoveSymbolicLink: SendTo
-  - RemoveSymbolicLink: Voisinage d'impression
-  - RemoveSymbolicLink: Voisinage réseau
-  - Ignore: OneDrive - FNAC
-  - CheckHidden: Favorites
-  - Ignore: Recent
-  - CheckHidden: Searches
-  - Ignore: repos
-  - Ignore: Wallpapers
-  - CheckEmptyDirectory: Downloads
-  - Remove: source
-  - CheckEmptyDirectoryAndHide: Music
-  - CheckEmptyDirectoryAndHide: 3D Objects
-  - CheckEmptyDirectoryAndHide: Contacts
-  - CheckEmptyDirectoryAndHide: Saved Games
-  - Directory:
-      Name: Documents
-      Files:
-        - CheckHidden: Default.rdp
-      Directories:
-        - Ignore: GIT
-        - Ignore: Mes sources de données
-        - Ignore: WindowsPowerShell
-        - RemoveSymbolicLink: Ma musique 
-        - RemoveSymbolicLink: Mes images 
-        - RemoveSymbolicLink: Mes vidéos 
-        - Remove: Downloads
-        - Remove: Custom Office Templates
-        - Remove: Fiddler2
-        - Remove: IISExpress
-        - Remove: Mes fichiers reçus
-        - Remove: Modèles Office personnalisés
-        - Remove: My Received Files
-        - Remove: My Web Sites
-        - Remove: Outlook Files
-        - Remove: SQL Server Management Studio
-        - Remove: Visual Studio 2015
-        - Remove: Visual Studio 2017
-        - Remove: Visual Studio 2019
-  - Directory:
-      Name: REGEX:^Google\s*Drive$
-      Directories:
-        - Ignore: Checklist
-        - Ignore: Documents
-        - Ignore: Draft
-        - Ignore: Images
-        - Ignore: ok
-        - Ignore: Projets
-        - Ignore: TMP
-        - CheckHidden: .tmp.drivedownload
-  - Directory:
-      Name: Pictures
-      Directories:
-      - CheckEmptyDirectoryAndHide: Camera Roll
-      - CheckEmptyDirectoryAndHide: Saved Pictures
-      - CheckEmptyDirectoryAndHide: Screenshots 
-      - Ignore: Screenpresso
-  - Directory:
-      Name: Videos
-      Directories: 
-      - CheckEmptyDirectoryAndHide: Captures
-  - Directory:
-      Name: Desktop
-      Files:
-      - Remove: REGEX:\.lnk$
+- Name: '~'
+  Files:
+    - Ignore: REGEX:^ntuser\.
+    - CheckNotHidden: .yarnrc
+    - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+    - Remove: coffeelint.json
+    - Remove: tslint.json
+    - Remove: REGEX:^\.v8flags\..+\.json
+    - Remove: REGEX:^tmp[\w\d\.-]+.pem
+  Directories:
+    - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+    - CheckHidden: IntelGraphicsProfiles
+    - CheckHidden: Links
+    - CheckHidden: MicrosoftEdgeBackups
+    - CheckHidden: OpenVPN
+    - Ignore: AppData
+    - Ignore: Qa
+    - RemoveSymbolicLink: Application Data
+    - RemoveSymbolicLink: Cookies
+    - RemoveSymbolicLink: Local Settings
+    - RemoveSymbolicLink: Menu Démarrer
+    - RemoveSymbolicLink: Mes documents
+    - RemoveSymbolicLink: Modèles
+    - RemoveSymbolicLink: SendTo
+    - RemoveSymbolicLink: Voisinage d'impression
+    - RemoveSymbolicLink: Voisinage réseau
+    - Ignore: OneDrive - FNAC
+    - CheckHidden: Favorites
+    - Ignore: Recent
+    - CheckHidden: Searches
+    - Ignore: repos
+    - Ignore: Wallpapers
+    - CheckEmptyDirectory: Downloads
+    - Remove: source
+    - CheckEmptyDirectoryAndHide: Music
+    - CheckEmptyDirectoryAndHide: 3D Objects
+    - CheckEmptyDirectoryAndHide: Contacts
+    - CheckEmptyDirectoryAndHide: Saved Games
+    - Directory:
+        Name: Documents
+        Files:
+          - CheckHidden: Default.rdp
+        Directories:
+          - Ignore: GIT
+          - Ignore: Mes sources de données
+          - Ignore: WindowsPowerShell
+          - RemoveSymbolicLink: Ma musique 
+          - RemoveSymbolicLink: Mes images 
+          - RemoveSymbolicLink: Mes vidéos 
+          - Remove: Downloads
+          - Remove: Custom Office Templates
+          - Remove: Fiddler2
+          - Remove: IISExpress
+          - Remove: Mes fichiers reçus
+          - Remove: Modèles Office personnalisés
+          - Remove: My Received Files
+          - Remove: My Web Sites
+          - Remove: Outlook Files
+          - Remove: SQL Server Management Studio
+          - Remove: Visual Studio 2015
+          - Remove: Visual Studio 2017
+          - Remove: Visual Studio 2019
+    - Directory:
+        Name: REGEX:^Google\s*Drive$
+        Directories:
+          - Ignore: Checklist
+          - Ignore: Documents
+          - Ignore: Draft
+          - Ignore: Images
+          - Ignore: ok
+          - Ignore: Projets
+          - Ignore: TMP
+          - CheckHidden: .tmp.drivedownload
+    - Directory:
+        Name: Pictures
+        Directories:
+        - CheckEmptyDirectoryAndHide: Camera Roll
+        - CheckEmptyDirectoryAndHide: Saved Pictures
+        - CheckEmptyDirectoryAndHide: Screenshots 
+        - Ignore: Screenpresso
+    - Directory:
+        Name: Videos
+        Directories: 
+        - CheckEmptyDirectoryAndHide: Captures
+    - Directory:
+        Name: Desktop
+        Files:
+        - Remove: REGEX:\.lnk$
+- Name: 'C:\'
+  Files:
+    - Ignore: REGEX:^.*\.sys$
+  Directories:
+    - CheckHidden: PerfLogs
+    - Ignore: $Recycle.Bin
+    - Ignore: System Volume Information
+    - Ignore: Data
+    - Ignore: Windows
+    - Ignore: Documents and Settings
+    - CheckHidden: inetpub
+    - Ignore: InitFiles
+    - Ignore: Program Files
+    - Ignore: Program Files (x86)
+    - Ignore: ProgramData
+    - Ignore: QaTools
+    - Ignore: Recovery
+    - Ignore: Servers
+    - Ignore: SQL-SQLEXPRESS-ExtensibilityData
+    - Ignore: Tests
+    - Ignore: tools
+    - Ignore: Upload
+    - Ignore: Users
+    - Ignore: Windows
+- Name: 'D:\'
+  Directories:
+    - Ignore: $Recycle.Bin
+    - Ignore: System Volume Information
+    - Ignore: GIT
+    - Ignore: TMP
+    - Ignore: VRM

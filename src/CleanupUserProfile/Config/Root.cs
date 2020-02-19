@@ -3,15 +3,10 @@
 namespace CleanupUserProfile.Config
 {
     [Serializable]
-    internal class Root
-    {
-        public FileRule[] Files { get; set; }
-        public DirectoryRule[] Directories { get; set; }
-    }
-
-    [Serializable]
-    internal class Directory : Root
+    internal class Directory
     {
         public string Name { get; set; }
+        public FileRule[] Files { get; set; }
+        public DirectoryRule[] Directories { get; set; }
     }
 }
