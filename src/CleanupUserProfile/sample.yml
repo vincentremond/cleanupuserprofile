@@ -35,7 +35,7 @@ Directories:
   - CheckEmptyDirectoryAndHide: 3D Objects
   - CheckEmptyDirectoryAndHide: Contacts
   - CheckEmptyDirectoryAndHide: Saved Games
-  - SubDirectory:
+  - Directory:
       Name: Documents
       Files:
         - CheckHidden: Default.rdp
@@ -59,7 +59,7 @@ Directories:
         - Remove: Visual Studio 2015
         - Remove: Visual Studio 2017
         - Remove: Visual Studio 2019
-  - SubDirectory:
+  - Directory:
       Name: REGEX:^Google\s*Drive$
       Directories:
         - Ignore: Checklist
@@ -70,18 +70,18 @@ Directories:
         - Ignore: Projets
         - Ignore: TMP
         - CheckHidden: .tmp.drivedownload
-  - SubDirectory:
+  - Directory:
       Name: Pictures
       Directories:
       - CheckEmptyDirectoryAndHide: Camera Roll
       - CheckEmptyDirectoryAndHide: Saved Pictures
       - CheckEmptyDirectoryAndHide: Screenshots 
       - Ignore: Screenpresso
-  - SubDirectory:
+  - Directory:
       Name: Videos
       Directories: 
       - CheckEmptyDirectoryAndHide: Captures
-  - SubDirectory:
+  - Directory:
       Name: Desktop
       Files:
       - Remove: REGEX:\.lnk$

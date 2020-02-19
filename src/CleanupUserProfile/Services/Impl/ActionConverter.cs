@@ -32,12 +32,12 @@ namespace CleanupUserProfile.Services.Impl
         }
 
         public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories,
-            string subDirectoryName = null)
+            string directoryName = null)
         {
             var filesActions = Convert(configFiles);
             filesActions.Add(new IgnoreAction("desktop.ini"));
             var directoriesActions = Convert(configDirectories);
-            return new DirectoryAction(filesActions, directoriesActions, subDirectoryName);
+            return new DirectoryAction(filesActions, directoriesActions, directoryName);
         }
 
         private IAction ConvertSingle(
@@ -47,9 +47,9 @@ namespace CleanupUserProfile.Services.Impl
             var actionFactory = _actionFactories.SingleOrDefault(a => a.ActionName == name);
             if (actionFactory == null) throw new Exception($"Failed to determine action for {name}.");
 
-            if (value is SubDirectory subDirectory)
+            if (value is Directory directory)
             {
-                return GetDirectoryAction(subDirectory.Files, subDirectory.Directories, subDirectory.Name);
+                return GetDirectoryAction(directory.Files, directory.Directories, directory.Name);
             }
 
             return actionFactory.GetAction(value);
