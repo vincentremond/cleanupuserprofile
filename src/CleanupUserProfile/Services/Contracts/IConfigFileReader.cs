@@ -5,7 +5,6 @@ namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IConfigFileReader
     {
-        Task<Root> ReadConfigFileAsync(
-            string configFilePath);
+        Task<Root> ReadConfigFileAsync(string configFilePath);
     }
 }

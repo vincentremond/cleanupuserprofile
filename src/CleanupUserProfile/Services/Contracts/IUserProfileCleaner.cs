@@ -4,7 +4,6 @@ namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IUserProfileCleaner
     {
-        Task CleanupAsync(
-            string configFilePath);
+        Task CleanupAsync(string configFilePath);
     }
 }

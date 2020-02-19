@@ -10,7 +10,7 @@ namespace CleanupUserProfile.Config
     }
 
     [Serializable]
-    internal class SubDirectory : Root
+    internal class Directory : Root
     {
         public string Name { get; set; }
     }

@@ -8,8 +8,7 @@ namespace CleanupUserProfile.Services.Impl
 {
     internal class ConfigFileReader : IConfigFileReader
     {
-        public async Task<Root> ReadConfigFileAsync(
-            string configFilePath)
+        public async Task<Root> ReadConfigFileAsync(string configFilePath)
         {
             var d = new Deserializer();
             var fileContents = await File.ReadAllTextAsync(configFilePath);

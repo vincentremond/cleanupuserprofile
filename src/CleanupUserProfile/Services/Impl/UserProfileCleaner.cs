@@ -19,8 +19,7 @@ namespace CleanupUserProfile.Services.Impl
             _actionConverter = actionConverter;
         }
 
-        public async Task CleanupAsync(
-            string configFilePath)
+        public async Task CleanupAsync(string configFilePath)
         {
             var config = await _configFileReader.ReadConfigFileAsync(configFilePath);
             var directoryCleanupAction = _actionConverter.GetDirectoryAction(config.Files, config.Directories);

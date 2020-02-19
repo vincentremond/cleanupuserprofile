@@ -5,6 +5,6 @@ namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IActionConverter
     {
-        DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories, string subDirectoryPattern = null);
+        DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories, string directoryPattern = null);
     }
 }

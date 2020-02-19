@@ -22,6 +22,6 @@ namespace CleanupUserProfile.Config
         public string CheckEmptyDirectory { get; set; }
         public string CheckEmptyDirectoryAndHide { get; set; }
         public string RemoveSymbolicLink { get; set; }
-        public SubDirectory SubDirectory { get; set; }
+        public Directory Directory { get; set; }
     }
 }
