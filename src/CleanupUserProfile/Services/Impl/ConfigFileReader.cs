@@ -1,19 +1,19 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using CleanupUserProfile.Config;
 using CleanupUserProfile.Services.Contracts;
 using YamlDotNet.Serialization;
+using Directory = CleanupUserProfile.Config.Directory;
 
 namespace CleanupUserProfile.Services.Impl
 {
     internal class ConfigFileReader : IConfigFileReader
     {
-        public async Task<Root> ReadConfigFileAsync(
-            string configFilePath)
+        public async Task<IEnumerable<Directory>> ReadConfigFileAsync(string configFilePath)
         {
             var d = new Deserializer();
             var fileContents = await File.ReadAllTextAsync(configFilePath);
-            return d.Deserialize<Root>(fileContents);
+            return d.Deserialize<IEnumerable<Directory>>(fileContents);
         }
     }
 }

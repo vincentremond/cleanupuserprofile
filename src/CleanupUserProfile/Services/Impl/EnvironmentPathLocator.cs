@@ -6,9 +6,14 @@ namespace CleanupUserProfile.Services.Impl
 {
     internal class EnvironmentPathLocator : IPathLocator
     {
-        public DirectoryInfo GetUserProfile()
+        public DirectoryInfo Locate(string directoryName)
         {
-            return new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            if (directoryName == "~")
+            {
+                return new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            }
+
+            return new DirectoryInfo(directoryName);
         }
     }
 }

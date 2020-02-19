@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CleanupUserProfile.Config;
 
 namespace CleanupUserProfile.Services.Contracts
 {
     internal interface IConfigFileReader
     {
-        Task<Root> ReadConfigFileAsync(
-            string configFilePath);
+        Task<IEnumerable<Directory>> ReadConfigFileAsync(string configFilePath);
     }
 }
