@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class CheckHiddenAction : BaseAction
     {
-        public CheckHiddenAction(
-            string pattern) : base(pattern)
+        public CheckHiddenAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 

@@ -6,7 +6,6 @@ namespace CleanupUserProfile.ActionFactory
     {
         string ActionName { get; }
 
-        IAction GetAction(
-            object value);
+        IAction GetAction(object value);
     }
 }

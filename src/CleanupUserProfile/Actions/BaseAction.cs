@@ -1,15 +1,18 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal abstract class BaseAction : IAction
     {
+        protected readonly IFileSystemOperator _fileSystemOperator;
         private readonly Regex _pattern;
 
-        protected BaseAction(string pattern)
+        protected BaseAction(IFileSystemOperator fileSystemOperator, string pattern)
         {
+            _fileSystemOperator = fileSystemOperator;
             if (pattern != null) _pattern = ToRegex(pattern);
         }
 
@@ -35,7 +38,7 @@ namespace CleanupUserProfile.Actions
             return file is FileInfo x && x.Name.Equals("Desktop.ini", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        protected static bool SetVisibility<T>(
+        protected bool SetVisibility<T>(
             T fileToModify,
             Func<FileAttributes, FileAttributes> modifyAction)
             where T : FileSystemInfo
@@ -47,7 +50,7 @@ namespace CleanupUserProfile.Actions
                 return false;
             }
 
-            File.SetAttributes(fileToModify.FullName, newAttributes);
+            _fileSystemOperator.SetFileAttributes(fileToModify.FullName, newAttributes);
             return true;
         }
 

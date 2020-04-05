@@ -1,18 +1,19 @@
 ﻿using System;
 using System.IO;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class RemoveSymbolicLinkAction : BaseDirectoryAction
     {
-        public RemoveSymbolicLinkAction(string pattern) : base(pattern)
+        public RemoveSymbolicLinkAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 
         protected override void Execute(
             DirectoryInfo directory)
         {
-            directory.Delete(false);
+            _fileSystemOperator.DeleteDirectory(directory, false);
             Console.WriteLine($" Removed : {directory.FullName}");
         }
     }

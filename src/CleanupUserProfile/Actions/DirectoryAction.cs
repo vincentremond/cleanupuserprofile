@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
@@ -11,9 +12,10 @@ namespace CleanupUserProfile.Actions
         private readonly IEnumerable<IAction> _directoriesActions;
 
         public DirectoryAction(
+            IFileSystemOperator fileSystemOperator,
             IEnumerable<IAction> filesActions,
             IEnumerable<IAction> directoriesActions,
-            string pattern = null) : base(pattern)
+            string pattern = null) : base(fileSystemOperator, pattern)
         {
             _filesActions = filesActions;
             _directoriesActions = directoriesActions;
