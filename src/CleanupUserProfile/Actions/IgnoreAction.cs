@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class IgnoreAction : BaseAction
     {
-        public IgnoreAction(string pattern) : base(pattern)
+        public IgnoreAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 

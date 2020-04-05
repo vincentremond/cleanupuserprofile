@@ -8,7 +8,7 @@ namespace CleanupUserProfile
 {
     internal static class ApplicationInitializer
     {
-        public static ServiceProvider Init()
+        public static ServiceProvider Init(bool simulate)
         {
             var serviceProvider = new ServiceCollection();
 
@@ -26,6 +26,15 @@ namespace CleanupUserProfile
             serviceProvider.AddTransient<IActionFactory, DirectoryActionFactory>();
             serviceProvider.AddTransient<IActionFactory, RemoveSymbolicLinkActionFactory>();
 
+            if (simulate)
+            {
+                serviceProvider.AddTransient<IFileSystemOperator, SimulationFileSystemOperator>();
+            }
+            else
+            {
+                serviceProvider.AddTransient<IFileSystemOperator, RealFileSystemOperator>();
+            }
+            
             serviceProvider.AddLogging(builder => builder.AddConsole());
 
             return serviceProvider.BuildServiceProvider();

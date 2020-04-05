@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class RemoveAction : BaseAction
     {
-        public RemoveAction(
-            string pattern) : base(pattern)
+        public RemoveAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 
@@ -17,7 +17,7 @@ namespace CleanupUserProfile.Actions
             {
                 case FileInfo file:
                 {
-                    file.Delete();
+                    _fileSystemOperator.DeleteFile(file);
                     Console.WriteLine($" Removed : {file.FullName}");
 
                     break;
@@ -29,12 +29,11 @@ namespace CleanupUserProfile.Actions
                         .ToList();
                     foreach (var f in files)
                     {
-                        f.Attributes = FileAttributes.Normal;
-                        f.Delete();
+                        _fileSystemOperator.DeleteFile(f);
                         Console.WriteLine($" Removed : {f.FullName}");
                     }
 
-                    directory.Delete(true);
+                    _fileSystemOperator.DeleteDirectory(directory, true);
                     Console.WriteLine($" Removed : {directory.FullName}");
 
                     break;

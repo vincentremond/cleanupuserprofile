@@ -1,18 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class CheckEmptyDirectoryAction : BaseDirectoryAction
     {
-        public CheckEmptyDirectoryAction(
-            string pattern) : base(pattern)
+        public CheckEmptyDirectoryAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 
-        protected override void Execute(
-            DirectoryInfo directory)
+        protected override void Execute(DirectoryInfo directory)
         {
             var files = directory
                 .GetFiles()
@@ -23,7 +22,7 @@ namespace CleanupUserProfile.Actions
 
             foreach (var file in files)
             {
-                Console.WriteLine($" Remove me : {file.FullName}");
+                Console.WriteLine($" Please, remove me : {file.FullName}");
             }
         }
     }

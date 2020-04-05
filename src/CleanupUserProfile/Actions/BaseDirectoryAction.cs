@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal abstract class BaseDirectoryAction : BaseAction
     {
-        protected BaseDirectoryAction(string pattern) : base(pattern)
+        protected BaseDirectoryAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 

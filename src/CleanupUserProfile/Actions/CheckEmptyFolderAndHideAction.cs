@@ -1,17 +1,16 @@
 ﻿using System;
 using System.IO;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class CheckEmptyDirectoryAndHideAction : CheckEmptyDirectoryAction
     {
-        public CheckEmptyDirectoryAndHideAction(
-            string pattern) : base(pattern)
+        public CheckEmptyDirectoryAndHideAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
 
-        protected override void Execute(
-            DirectoryInfo directory)
+        protected override void Execute(DirectoryInfo directory)
         {
             base.Execute(directory);
 

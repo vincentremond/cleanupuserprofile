@@ -11,11 +11,14 @@ namespace CleanupUserProfile.Services.Impl
     internal class ActionConverter : IActionConverter
     {
         private readonly IEnumerable<IActionFactory> _actionFactories;
+        private readonly IFileSystemOperator _fileSystemOperator;
 
         public ActionConverter(
-            IEnumerable<IActionFactory> actionFactories)
+            IEnumerable<IActionFactory> actionFactories,
+            IFileSystemOperator fileSystemOperator)
         {
             _actionFactories = actionFactories;
+            _fileSystemOperator = fileSystemOperator;
         }
 
         public IList<IAction> Convert(
@@ -35,9 +38,9 @@ namespace CleanupUserProfile.Services.Impl
             string directoryName = null)
         {
             var filesActions = Convert(configFiles);
-            filesActions.Add(new IgnoreAction("desktop.ini"));
+            filesActions.Add(new IgnoreAction(_fileSystemOperator, "desktop.ini"));
             var directoriesActions = Convert(configDirectories);
-            return new DirectoryAction(filesActions, directoriesActions, directoryName);
+            return new DirectoryAction(_fileSystemOperator, filesActions, directoriesActions, directoryName);
         }
 
         private IAction ConvertSingle(

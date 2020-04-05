@@ -1,15 +1,22 @@
 ﻿using CleanupUserProfile.Actions;
+using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.ActionFactory
 {
     internal class IgnoreActionFactory : IActionFactory
     {
+        private readonly IFileSystemOperator _fileSystemOperator;
+
+        public IgnoreActionFactory(IFileSystemOperator fileSystemOperator)
+        {
+            _fileSystemOperator = fileSystemOperator;
+        }
+
         public string ActionName => "Ignore";
 
-        public IAction GetAction(
-            object value)
+        public IAction GetAction(object value)
         {
-            return new IgnoreAction(value as string);
+            return new IgnoreAction(_fileSystemOperator, value as string);
         }
     }
 }
