@@ -113,10 +113,10 @@
 #     - Ignore: Users
 #     - Ignore: Windows
 #     - Ignore: Windows.old
-- Name: 'D:\'
-  Directories:
-    - Ignore: $Recycle.Bin
-    - Ignore: System Volume Information
-    - Ignore: GIT
-    - Ignore: TMP
-    - Ignore: VRM
+# - Name: 'D:\'
+#   Directories:
+#     - Ignore: $Recycle.Bin
+#     - Ignore: System Volume Information
+#     - Ignore: GIT
+#     - Ignore: TMP
+#     - Ignore: VRM
