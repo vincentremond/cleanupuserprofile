@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using CleanupUserProfile.ActionFactory;
 using CleanupUserProfile.Actions;
 using CleanupUserProfile.Config;
@@ -35,30 +36,41 @@ namespace CleanupUserProfile.Services.Impl
         }
 
         public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories,
-            string directoryName = null)
+            string directoryName, string selfActionName)
         {
+            var selfAction = !string.IsNullOrEmpty(selfActionName) ? ConvertSingle(selfActionName, directoryName) : null;
             var filesActions = Convert(configFiles);
             filesActions.Add(new IgnoreAction(_fileSystemOperator, "desktop.ini"));
             var directoriesActions = Convert(configDirectories);
-            return new DirectoryAction(_fileSystemOperator, filesActions, directoriesActions, directoryName);
+            return new DirectoryAction(_fileSystemOperator, selfAction, filesActions, directoriesActions, directoryName);
         }
 
         private IAction ConvertSingle(
             GenericRule arg)
         {
-            var (name, value) = Get(arg);
+            var (name, value) = GetActionNameAndValue(arg);
+            return ConvertSingle(name, value);
+        }
+
+        private IAction ConvertSingle(string name, object value)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
             var actionFactory = _actionFactories.SingleOrDefault(a => a.ActionName == name);
             if (actionFactory == null) throw new Exception($"Failed to determine action for {name}.");
 
             if (value is Directory directory)
             {
-                return GetDirectoryAction(directory.Files, directory.Directories, directory.Name);
+                return GetDirectoryAction(directory.Files, directory.Directories, directory.Name, directory.Self);
             }
 
             return actionFactory.GetAction(value);
         }
 
-        private static (string Name, object Value) Get(
+        private static (string Name, object Value) GetActionNameAndValue(
             GenericRule genericRule)
         {
             var props = genericRule.GetType().GetProperties();
