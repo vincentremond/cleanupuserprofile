@@ -8,15 +8,18 @@ namespace CleanupUserProfile.Actions
 {
     internal class DirectoryAction : BaseAction
     {
+        private readonly IAction _selfAction;
         private readonly IEnumerable<IAction> _filesActions;
         private readonly IEnumerable<IAction> _directoriesActions;
 
         public DirectoryAction(
             IFileSystemOperator fileSystemOperator,
+            IAction selfAction,
             IEnumerable<IAction> filesActions,
             IEnumerable<IAction> directoriesActions,
-            string pattern = null) : base(fileSystemOperator, pattern)
+            string pattern) : base(fileSystemOperator, pattern)
         {
+            _selfAction = selfAction;
             _filesActions = filesActions;
             _directoriesActions = directoriesActions;
         }
@@ -34,6 +37,7 @@ namespace CleanupUserProfile.Actions
                 return;
             }
 
+            _selfAction?.Execute(fileSystemInfo);
             PerformActions(_filesActions, directoryInfo.GetFiles());
             PerformActions(_directoriesActions, directoryInfo.GetDirectories());
         }

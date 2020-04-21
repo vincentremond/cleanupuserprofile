@@ -31,7 +31,11 @@
     - Ignore: repos
     - Ignore: Wallpapers
     - CheckEmptyDirectory: Downloads
-    - Remove: source
+    - Directory:
+        Name: source
+        Self: CheckHidden
+        Directories:
+          - CheckEmptyDirectory: repos
     - Remove: RiderProjects
     - CheckEmptyDirectoryAndHide: Music
     - CheckEmptyDirectoryAndHide: 3D Objects

@@ -6,6 +6,7 @@ namespace CleanupUserProfile.Config
     internal class Directory
     {
         public string Name { get; set; }
+        public string Self { get; set; }
         public FileRule[] Files { get; set; }
         public DirectoryRule[] Directories { get; set; }
     }
