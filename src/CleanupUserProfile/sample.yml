@@ -18,12 +18,19 @@
     - RemoveSymbolicLink: Application Data
     - RemoveSymbolicLink: Cookies
     - RemoveSymbolicLink: Local Settings
+    - RemoveSymbolicLink: SendTo
+    # FR
     - RemoveSymbolicLink: Menu Démarrer
     - RemoveSymbolicLink: Mes documents
     - RemoveSymbolicLink: Modèles
-    - RemoveSymbolicLink: SendTo
     - RemoveSymbolicLink: Voisinage d'impression
     - RemoveSymbolicLink: Voisinage réseau
+    # EN
+    - RemoveSymbolicLink: My Documents
+    - RemoveSymbolicLink: NetHood
+    - RemoveSymbolicLink: PrintHood
+    - RemoveSymbolicLink: Start Menu
+    - RemoveSymbolicLink: Templates
     - Ignore: OneDrive - FNAC
     - CheckHidden: Favorites
     - Ignore: Recent
@@ -49,9 +56,6 @@
           - Ignore: GIT
           - Ignore: Mes sources de données
           - Ignore: WindowsPowerShell
-          - RemoveSymbolicLink: Ma musique 
-          - RemoveSymbolicLink: Mes images 
-          - RemoveSymbolicLink: Mes vidéos 
           - Remove: Downloads
           - Remove: Custom Office Templates
           - Remove: Fiddler2
@@ -65,6 +69,14 @@
           - Remove: Visual Studio 2015
           - Remove: Visual Studio 2017
           - Remove: Visual Studio 2019
+          # FR
+          - RemoveSymbolicLink: Ma musique
+          - RemoveSymbolicLink: Mes images
+          - RemoveSymbolicLink: Mes vidéos
+          # EN
+          - RemoveSymbolicLink: My Music
+          - RemoveSymbolicLink: My Pictures
+          - RemoveSymbolicLink: My Videos
     - Directory:
         Name: REGEX:^Google\s*Drive$
         Directories:
