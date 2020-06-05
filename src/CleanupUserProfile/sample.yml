@@ -136,3 +136,13 @@
 #     - Ignore: GIT
 #     - Ignore: TMP
 #     - Ignore: VRM
+- Name: 'D:\DAT\'
+  Directories:
+    - Directory:
+        Name: MergeRequestReview
+        Directories: 
+        - Remove: REGEX:.*
+    - Directory:
+        Name: FIXObs
+        Directories: 
+        - Remove: REGEX:.*
