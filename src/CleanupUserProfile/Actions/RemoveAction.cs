@@ -7,6 +7,8 @@ namespace CleanupUserProfile.Actions
 {
     internal class RemoveAction : BaseAction
     {
+        protected virtual bool IsVerbose => true;
+
         public RemoveAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
@@ -30,7 +32,10 @@ namespace CleanupUserProfile.Actions
                     foreach (var f in files)
                     {
                         _fileSystemOperator.DeleteFile(f);
-                        Console.WriteLine($" Removed : {f.FullName}");
+                        if (IsVerbose)
+                        {
+                            Console.WriteLine($" Removed : {f.FullName}");
+                        }
                     }
 
                     _fileSystemOperator.DeleteDirectory(directory, true);
