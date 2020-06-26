@@ -103,46 +103,13 @@
         Name: Desktop
         Files:
         - Remove: REGEX:\.lnk$
-# - Name: 'C:\'
-#   Files:
-#     - Ignore: REGEX:^.*\.sys$
-#   Directories:
-#     - Ignore: PerfLogs
-#     - Ignore: $Recycle.Bin
-#     - Ignore: System Volume Information
-#     - Ignore: Data
-#     - Ignore: Windows
-#     - Ignore: Documents and Settings
-#     - Ignore: Intel
-#     - Ignore: inetpub
-#     - Ignore: InitFiles
-#     - Ignore: Program Files
-#     - Ignore: Program Files (x86)
-#     - Ignore: ProgramData
-#     - Ignore: QaTools
-#     - Ignore: Recovery
-#     - Ignore: Servers
-#     - Ignore: SQL-SQLEXPRESS-ExtensibilityData
-#     - Ignore: Tests
-#     - Ignore: tools
-#     - Ignore: Upload
-#     - Ignore: Users
-#     - Ignore: Windows
-#     - Ignore: Windows.old
-# - Name: 'D:\'
-#   Directories:
-#     - Ignore: $Recycle.Bin
-#     - Ignore: System Volume Information
-#     - Ignore: GIT
-#     - Ignore: TMP
-#     - Ignore: VRM
 - Name: 'D:\DAT\'
   Directories:
     - Directory:
         Name: MergeRequestReview
         Directories: 
-        - Remove: REGEX:.*
+        - QuietRemove: REGEX:.*
     - Directory:
         Name: FIXObs
         Directories: 
-        - Remove: REGEX:.*
+        - QuietRemove: REGEX:.*

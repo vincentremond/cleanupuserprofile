@@ -9,6 +9,7 @@ namespace CleanupUserProfile.Config
         public string CheckNotHidden { get; set; }
         public string Ignore { get; set; }
         public string Remove { get; set; }
+        public string QuietRemove { get; set; }
     }
 
     [Serializable]
