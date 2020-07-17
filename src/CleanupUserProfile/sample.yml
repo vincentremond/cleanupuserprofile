@@ -5,6 +5,7 @@
     - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
     - Remove: coffeelint.json
     - Remove: tslint.json
+    - Remove: Sti_Trace.log
     - Remove: REGEX:^\.v8flags\..+\.json
     - Remove: REGEX:^tmp[\w\d\.-]+.pem
   Directories:
