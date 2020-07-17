@@ -6,6 +6,7 @@ try {
     dotnet run -- --simulate
     Read-Host "Press enter to continue ?"
     dotnet run
+    Read-Host "Press enter to exit"
 }
 finally {
     Pop-Location
