@@ -1,116 +1,122 @@
 - Name: '~'
   Files:
-    - Ignore: REGEX:^ntuser\.
-    - CheckNotHidden: .yarnrc
-    - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
-    - Remove: coffeelint.json
-    - Remove: tslint.json
-    - Remove: Sti_Trace.log
-    - Remove: REGEX:^\.v8flags\..+\.json
-    - Remove: REGEX:^tmp[\w\d\.-]+.pem
+  - Ignore: REGEX:^ntuser\.
+  - CheckNotHidden: .yarnrc
+  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+  - Remove: coffeelint.json
+  - Remove: tslint.json
+  - Remove: Sti_Trace.log
+  - Remove: REGEX:^\.v8flags\..+\.json
+  - Remove: REGEX:^tmp[\w\d\.-]+.pem
   Directories:
-    - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
-    - CheckHidden: IntelGraphicsProfiles
-    - CheckHidden: Links
-    - CheckHidden: MicrosoftEdgeBackups
-    - CheckHidden: OpenVPN
-    - Ignore: AppData
-    - Ignore: Qa
-    - RemoveSymbolicLink: Application Data
-    - RemoveSymbolicLink: Cookies
-    - RemoveSymbolicLink: Local Settings
-    - RemoveSymbolicLink: SendTo
-    # FR
-    - RemoveSymbolicLink: Menu Démarrer
-    - RemoveSymbolicLink: Mes documents
-    - RemoveSymbolicLink: Modèles
-    - RemoveSymbolicLink: Voisinage d'impression
-    - RemoveSymbolicLink: Voisinage réseau
-    # EN
-    - RemoveSymbolicLink: My Documents
-    - RemoveSymbolicLink: NetHood
-    - RemoveSymbolicLink: PrintHood
-    - RemoveSymbolicLink: Start Menu
-    - RemoveSymbolicLink: Templates
-    - Ignore: OneDrive - FNAC
-    - CheckHidden: Favorites
-    - Ignore: Recent
-    - CheckHidden: Searches
-    - Ignore: repos
-    - Ignore: Wallpapers
-    - CheckEmptyDirectory: Downloads
-    - Directory:
-        Name: source
-        Self: CheckHidden
-        Directories:
-          - CheckEmptyDirectory: repos
-    - Remove: RiderProjects
-    - CheckEmptyDirectoryAndHide: Music
-    - CheckEmptyDirectoryAndHide: 3D Objects
-    - CheckEmptyDirectoryAndHide: Contacts
-    - CheckEmptyDirectoryAndHide: Saved Games
-    - Directory:
-        Name: Documents
-        Files:
-          - CheckHidden: Default.rdp
-        Directories:
-          - Ignore: GIT
-          - Ignore: Mes sources de données
-          - Ignore: WindowsPowerShell
-          - Remove: Downloads
-          - Remove: Custom Office Templates
-          - Remove: Fiddler2
-          - Remove: IISExpress
-          - Remove: Mes fichiers reçus
-          - Remove: Modèles Office personnalisés
-          - Remove: My Received Files
-          - Remove: My Web Sites
-          - Remove: Outlook Files
-          - Remove: SQL Server Management Studio
-          - Remove: Visual Studio 2015
-          - Remove: Visual Studio 2017
-          - Remove: Visual Studio 2019
-          # FR
-          - RemoveSymbolicLink: Ma musique
-          - RemoveSymbolicLink: Mes images
-          - RemoveSymbolicLink: Mes vidéos
-          # EN
-          - RemoveSymbolicLink: My Music
-          - RemoveSymbolicLink: My Pictures
-          - RemoveSymbolicLink: My Videos
-    - Directory:
-        Name: REGEX:^Google\s*Drive$
-        Directories:
-          - Ignore: Checklist
-          - Ignore: Documents
-          - Ignore: Draft
-          - Ignore: Images
-          - Ignore: ok
-          - Ignore: Projets
-          - Ignore: TMP
-          - CheckHidden: .tmp.drivedownload
-    - Directory:
-        Name: Pictures
-        Directories:
-        - CheckEmptyDirectoryAndHide: Camera Roll
-        - CheckEmptyDirectoryAndHide: Saved Pictures
-        - CheckEmptyDirectoryAndHide: Screenshots 
-        - Ignore: Screenpresso
-    - Directory:
-        Name: Videos
-        Directories: 
-        - CheckEmptyDirectoryAndHide: Captures
-    - Directory:
-        Name: Desktop
-        Files:
-        - Remove: REGEX:\.lnk$
+  - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
+  - CheckHidden: IntelGraphicsProfiles
+  - CheckHidden: Links
+  - CheckHidden: MicrosoftEdgeBackups
+  - CheckHidden: OpenVPN
+  - Ignore: AppData
+  - Ignore: Qa
+  - RemoveSymbolicLink: Application Data
+  - RemoveSymbolicLink: Cookies
+  - RemoveSymbolicLink: Local Settings
+  - RemoveSymbolicLink: SendTo
+  # FR
+  - RemoveSymbolicLink: Menu Démarrer
+  - RemoveSymbolicLink: Mes documents
+  - RemoveSymbolicLink: Modèles
+  - RemoveSymbolicLink: Voisinage d'impression
+  - RemoveSymbolicLink: Voisinage réseau
+  # EN
+  - RemoveSymbolicLink: My Documents
+  - RemoveSymbolicLink: NetHood
+  - RemoveSymbolicLink: PrintHood
+  - RemoveSymbolicLink: Start Menu
+  - RemoveSymbolicLink: Templates
+  - Ignore: OneDrive - FNAC
+  - CheckHidden: Favorites
+  - Ignore: Recent
+  - CheckHidden: Searches
+  - Ignore: repos
+  - Ignore: Wallpapers
+  - CheckEmptyDirectory: Downloads
+  - Directory:
+      Name: source
+      Self: CheckHidden
+      Directories:
+      - CheckEmptyDirectory: repos
+  - Remove: RiderProjects
+  - CheckEmptyDirectoryAndHide: Music
+  - CheckEmptyDirectoryAndHide: 3D Objects
+  - CheckEmptyDirectoryAndHide: Contacts
+  - CheckEmptyDirectoryAndHide: Saved Games
+  - Directory:
+      Name: Documents
+      Files:
+      - CheckHidden: Default.rdp
+      Directories:
+      - Ignore: GIT
+      - Ignore: Mes sources de données
+      - Ignore: WindowsPowerShell
+      - Remove: Downloads
+      - Remove: Custom Office Templates
+      - Remove: Fiddler2
+      - Remove: IISExpress
+      - Remove: Mes fichiers reçus
+      - Remove: Modèles Office personnalisés
+      - Remove: My Received Files
+      - Remove: My Web Sites
+      - Remove: Outlook Files
+      - Remove: SQL Server Management Studio
+      - Remove: Visual Studio 2015
+      - Remove: Visual Studio 2017
+      - Remove: Visual Studio 2019
+      # FR
+      - RemoveSymbolicLink: Ma musique
+      - RemoveSymbolicLink: Mes images
+      - RemoveSymbolicLink: Mes vidéos
+      # EN
+      - RemoveSymbolicLink: My Music
+      - RemoveSymbolicLink: My Pictures
+      - RemoveSymbolicLink: My Videos
+  - Directory:
+      Name: REGEX:^Google\s*Drive$
+      Directories:
+      - Ignore: Checklist
+      - Ignore: Documents
+      - Ignore: Draft
+      - Ignore: Images
+      - Ignore: ok
+      - Ignore: Projets
+      - Ignore: TMP
+      - CheckHidden: .tmp.drivedownload
+  - Directory:
+      Name: Pictures
+      Directories:
+      - CheckEmptyDirectoryAndHide: Camera Roll
+      - CheckEmptyDirectoryAndHide: Saved Pictures
+      - CheckEmptyDirectoryAndHide: Screenshots
+      - Ignore: Screenpresso
+  - Directory:
+      Name: Videos
+      Directories:
+      - CheckEmptyDirectoryAndHide: Captures
+  - Directory:
+      Name: Desktop
+      Files:
+      - Remove: REGEX:\.lnk$
 - Name: 'D:\DAT\'
   Directories:
-    - Directory:
-        Name: MergeRequestReview
-        Directories: 
-        - QuietRemove: REGEX:.*
-    - Directory:
-        Name: FIXObs
-        Directories: 
-        - QuietRemove: REGEX:.*
+  - Directory:
+      Name: MergeRequestReview
+      Directories:
+      - QuietRemove: REGEX:.*
+  - Directory:
+      Name: FIXObs
+      Directories:
+      - QuietRemove: REGEX:.*
+- Name: 'D:\TMP\'
+  Directories:
+  - Directory:
+      Name: REGEX:^\d{4}$
+      Directories:
+      - Ignore: REGEX:^\d{4}\.\d{2}$
