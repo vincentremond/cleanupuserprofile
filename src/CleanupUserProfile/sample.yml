@@ -57,6 +57,7 @@
       - Ignore: GIT
       - Ignore: Mes sources de données
       - Ignore: WindowsPowerShell
+      - Ignore: Fusion 360
       - Remove: Downloads
       - Remove: Custom Office Templates
       - Remove: Fiddler2
