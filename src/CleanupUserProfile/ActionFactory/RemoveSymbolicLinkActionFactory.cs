@@ -14,9 +14,6 @@ namespace CleanupUserProfile.ActionFactory
 
         public string ActionName => "RemoveSymbolicLink";
 
-        public IAction GetAction(object value)
-        {
-            return new RemoveSymbolicLinkAction(_fileSystemOperator, value as string);
-        }
+        public IAction GetAction(object value) => new RemoveSymbolicLinkAction(_fileSystemOperator, value as string);
     }
 }

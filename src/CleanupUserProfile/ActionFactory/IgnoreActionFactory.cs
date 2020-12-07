@@ -14,9 +14,6 @@ namespace CleanupUserProfile.ActionFactory
 
         public string ActionName => "Ignore";
 
-        public IAction GetAction(object value)
-        {
-            return new IgnoreAction(_fileSystemOperator, value as string);
-        }
+        public IAction GetAction(object value) => new IgnoreAction(_fileSystemOperator, value as string);
     }
 }

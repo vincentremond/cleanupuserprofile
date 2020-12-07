@@ -9,10 +9,7 @@ namespace CleanupUserProfile.Actions
         {
         }
 
-        public override void Execute(FileSystemInfo file)
-        {
-            Execute(file as DirectoryInfo);
-        }
+        public override void Execute(FileSystemInfo file) => Execute(file as DirectoryInfo);
 
         protected abstract void Execute(DirectoryInfo file);
     }

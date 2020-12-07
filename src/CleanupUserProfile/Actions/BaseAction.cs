@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using CleanupUserProfile.Services.Contracts;
 
@@ -13,13 +14,15 @@ namespace CleanupUserProfile.Actions
         protected BaseAction(IFileSystemOperator fileSystemOperator, string pattern)
         {
             _fileSystemOperator = fileSystemOperator;
-            if (pattern != null) _pattern = ToRegex(pattern);
+            if (pattern != null)
+            {
+                _pattern = ToRegex(pattern);
+            }
         }
 
-        public bool IsMatch(FileSystemInfo fileInfo)
-        {
-            return _pattern.IsMatch(fileInfo.Name);
-        }
+        protected virtual bool IsVerbose => true;
+
+        public bool IsMatch(FileSystemInfo fileInfo) => _pattern.IsMatch(fileInfo.Name);
 
         public abstract void Execute(FileSystemInfo file);
 
@@ -33,10 +36,7 @@ namespace CleanupUserProfile.Actions
             return new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         }
 
-        protected static bool IsDesktopIni(FileSystemInfo file)
-        {
-            return file is FileInfo x && x.Name.Equals("Desktop.ini", StringComparison.InvariantCultureIgnoreCase);
-        }
+        protected static bool IsDesktopIni(FileSystemInfo file) => file is FileInfo x && x.Name.Equals("Desktop.ini", StringComparison.InvariantCultureIgnoreCase);
 
         protected bool SetVisibility<T>(
             T fileToModify,
@@ -54,14 +54,26 @@ namespace CleanupUserProfile.Actions
             return true;
         }
 
-        protected static FileAttributes Show(FileAttributes fileAttributes)
-        {
-            return fileAttributes.WithoutFlag(FileAttributes.Hidden);
-        }
+        protected static FileAttributes Show(FileAttributes fileAttributes) => fileAttributes.WithoutFlag(FileAttributes.Hidden);
 
-        protected static FileAttributes Hide(FileAttributes fileAttributes)
+        protected static FileAttributes Hide(FileAttributes fileAttributes) => fileAttributes.WithFlag(FileAttributes.Hidden);
+
+        protected void RemoveDirectory(DirectoryInfo directory)
         {
-            return fileAttributes.WithFlag(FileAttributes.Hidden);
+            var files = directory
+                .GetFiles("*", SearchOption.AllDirectories)
+                .ToList();
+            foreach (var f in files)
+            {
+                _fileSystemOperator.DeleteFile(f);
+                if (IsVerbose)
+                {
+                    Console.WriteLine($" Removed : {f.FullName}");
+                }
+            }
+
+            _fileSystemOperator.DeleteDirectory(directory, true);
+            Console.WriteLine($" Removed : {directory.FullName}");
         }
     }
 }

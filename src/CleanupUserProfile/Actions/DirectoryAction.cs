@@ -8,9 +8,9 @@ namespace CleanupUserProfile.Actions
 {
     internal class DirectoryAction : BaseAction
     {
-        private readonly IAction _selfAction;
-        private readonly IEnumerable<IAction> _filesActions;
         private readonly IEnumerable<IAction> _directoriesActions;
+        private readonly IEnumerable<IAction> _filesActions;
+        private readonly IAction _selfAction;
 
         public DirectoryAction(
             IFileSystemOperator fileSystemOperator,
@@ -50,9 +50,13 @@ namespace CleanupUserProfile.Actions
             {
                 var action = filesActions.FirstOrDefault(r => r.IsMatch(fileSystemInfo));
                 if (action == null)
+                {
                     Console.WriteLine($" What to do ? {fileSystemInfo.GetType().Name} > {fileSystemInfo.FullName}");
+                }
                 else
+                {
                     action.Execute(fileSystemInfo);
+                }
             }
         }
     }

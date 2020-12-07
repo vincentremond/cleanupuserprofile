@@ -1,14 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Actions
 {
     internal class RemoveAction : BaseAction
     {
-        protected virtual bool IsVerbose => true;
-
         public RemoveAction(IFileSystemOperator fileSystemOperator, string pattern) : base(fileSystemOperator, pattern)
         {
         }
@@ -26,20 +23,7 @@ namespace CleanupUserProfile.Actions
                 }
                 case DirectoryInfo directory:
                 {
-                    var files = directory
-                        .GetFiles("*", SearchOption.AllDirectories)
-                        .ToList();
-                    foreach (var f in files)
-                    {
-                        _fileSystemOperator.DeleteFile(f);
-                        if (IsVerbose)
-                        {
-                            Console.WriteLine($" Removed : {f.FullName}");
-                        }
-                    }
-
-                    _fileSystemOperator.DeleteDirectory(directory, true);
-                    Console.WriteLine($" Removed : {directory.FullName}");
+                    RemoveDirectory(directory);
 
                     break;
                 }

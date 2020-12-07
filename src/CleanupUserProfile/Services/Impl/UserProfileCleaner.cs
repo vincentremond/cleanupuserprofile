@@ -51,10 +51,12 @@ namespace CleanupUserProfile.Services.Impl
             foreach (var (directoryInfo, directory) in directoriesInfo)
             {
                 var directoryCleanupActions =
-                    _actionConverter.GetDirectoryAction(directory.Files,
+                    _actionConverter.GetDirectoryAction(
+                        directory.Files,
                         directory.Directories,
-                        directoryPattern: null,
-                        selfActionName: null);
+                        null,
+                        null
+                    );
                 result.Add((directoryInfo, directoryCleanupActions));
             }
 

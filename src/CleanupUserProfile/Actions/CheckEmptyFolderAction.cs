@@ -11,19 +11,23 @@ namespace CleanupUserProfile.Actions
         {
         }
 
-        protected override void Execute(DirectoryInfo directory)
+        protected override void Execute(DirectoryInfo directory) => CheckEmpty(directory);
+
+        protected static bool CheckEmpty(DirectoryInfo directory)
         {
-            var files = directory
+            var filesAndDirectories = directory
                 .GetFiles()
                 .Cast<FileSystemInfo>()
                 .Union(directory.GetDirectories())
                 .Where(fsi => !IsDesktopIni(fsi))
                 .ToList();
 
-            foreach (var file in files)
+            foreach (var file in filesAndDirectories)
             {
                 Console.WriteLine($" Please, remove me : {file.FullName}");
             }
+
+            return !filesAndDirectories.Any();
         }
     }
 }

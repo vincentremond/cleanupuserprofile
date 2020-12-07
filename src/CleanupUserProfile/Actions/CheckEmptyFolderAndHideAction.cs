@@ -12,7 +12,10 @@ namespace CleanupUserProfile.Actions
 
         protected override void Execute(DirectoryInfo directory)
         {
-            base.Execute(directory);
+            if (!CheckEmpty(directory))
+            {
+                return;
+            }
 
             if (SetVisibility(directory, Hide))
             {
