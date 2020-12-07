@@ -71,6 +71,9 @@
       - Remove: Visual Studio 2015
       - Remove: Visual Studio 2017
       - Remove: Visual Studio 2019
+      - CheckEmptyDirectoryAndRemove: Audacity
+      - CheckEmptyDirectoryAndRemove: vcam
+      - CheckEmptyDirectoryAndRemove: Zoom
       # FR
       - RemoveSymbolicLink: Ma musique
       - RemoveSymbolicLink: Mes images

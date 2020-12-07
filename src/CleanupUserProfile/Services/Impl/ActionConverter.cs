@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using CleanupUserProfile.ActionFactory;
 using CleanupUserProfile.Actions;
 using CleanupUserProfile.Config;
@@ -22,6 +21,16 @@ namespace CleanupUserProfile.Services.Impl
             _fileSystemOperator = fileSystemOperator;
         }
 
+        public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories,
+            string directoryName, string selfActionName)
+        {
+            var selfAction = !string.IsNullOrEmpty(selfActionName) ? ConvertSingle(selfActionName, directoryName) : null;
+            var filesActions = Convert(configFiles);
+            filesActions.Add(new IgnoreAction(_fileSystemOperator, "desktop.ini"));
+            var directoriesActions = Convert(configDirectories);
+            return new DirectoryAction(_fileSystemOperator, selfAction, filesActions, directoriesActions, directoryName);
+        }
+
         public IList<IAction> Convert(
             IEnumerable<GenericRule> configFiles)
         {
@@ -33,16 +42,6 @@ namespace CleanupUserProfile.Services.Impl
             return configFiles
                 .Select(ConvertSingle)
                 .ToList();
-        }
-
-        public DirectoryAction GetDirectoryAction(FileRule[] configFiles, DirectoryRule[] configDirectories,
-            string directoryName, string selfActionName)
-        {
-            var selfAction = !string.IsNullOrEmpty(selfActionName) ? ConvertSingle(selfActionName, directoryName) : null;
-            var filesActions = Convert(configFiles);
-            filesActions.Add(new IgnoreAction(_fileSystemOperator, "desktop.ini"));
-            var directoriesActions = Convert(configDirectories);
-            return new DirectoryAction(_fileSystemOperator, selfAction, filesActions, directoriesActions, directoryName);
         }
 
         private IAction ConvertSingle(
@@ -60,7 +59,10 @@ namespace CleanupUserProfile.Services.Impl
             }
 
             var actionFactory = _actionFactories.SingleOrDefault(a => a.ActionName == name);
-            if (actionFactory == null) throw new Exception($"Failed to determine action for {name}.");
+            if (actionFactory == null)
+            {
+                throw new Exception($"Failed to determine action for {name}.");
+            }
 
             if (value is Directory directory)
             {

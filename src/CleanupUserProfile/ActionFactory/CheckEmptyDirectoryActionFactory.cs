@@ -14,9 +14,6 @@ namespace CleanupUserProfile.ActionFactory
 
         public string ActionName => "CheckEmptyDirectory";
 
-        public IAction GetAction(object value)
-        {
-            return new CheckEmptyDirectoryAction(_fileSystemOperator, value as string);
-        }
+        public IAction GetAction(object value) => new CheckEmptyDirectoryAction(_fileSystemOperator, value as string);
     }
 }

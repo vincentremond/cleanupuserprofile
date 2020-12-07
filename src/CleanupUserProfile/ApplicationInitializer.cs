@@ -21,6 +21,7 @@ namespace CleanupUserProfile
             serviceProvider.AddTransient<IActionFactory, CheckNotHiddenActionFactory>();
             serviceProvider.AddTransient<IActionFactory, CheckEmptyDirectoryActionFactory>();
             serviceProvider.AddTransient<IActionFactory, CheckEmptyDirectoryAndHideActionFactory>();
+            serviceProvider.AddTransient<IActionFactory, CheckEmptyDirectoryAndRemoveActionFactory>();
             serviceProvider.AddTransient<IActionFactory, IgnoreActionFactory>();
             serviceProvider.AddTransient<IActionFactory, RemoveActionFactory>();
             serviceProvider.AddTransient<IActionFactory, DirectoryActionFactory>();
@@ -35,7 +36,7 @@ namespace CleanupUserProfile
             {
                 serviceProvider.AddTransient<IFileSystemOperator, RealFileSystemOperator>();
             }
-            
+
             serviceProvider.AddLogging(builder => builder.AddConsole());
 
             return serviceProvider.BuildServiceProvider();

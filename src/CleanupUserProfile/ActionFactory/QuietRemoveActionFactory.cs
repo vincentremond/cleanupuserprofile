@@ -14,9 +14,6 @@ namespace CleanupUserProfile.ActionFactory
 
         public string ActionName => "QuietRemove";
 
-        public IAction GetAction(object value)
-        {
-            return new QuietRemoveAction(_fileSystemOperator, value as string);
-        }
+        public IAction GetAction(object value) => new QuietRemoveAction(_fileSystemOperator, value as string);
     }
 }

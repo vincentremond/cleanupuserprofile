@@ -7,9 +7,6 @@ namespace CleanupUserProfile.ActionFactory
     {
         public string ActionName => "Directory";
 
-        public IAction GetAction(object value)
-        {
-            throw new InvalidOperationException();
-        }
+        public IAction GetAction(object value) => throw new InvalidOperationException();
     }
 }

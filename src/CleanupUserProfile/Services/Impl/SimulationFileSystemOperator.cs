@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using CleanupUserProfile.Services.Contracts;
 
 namespace CleanupUserProfile.Services.Impl

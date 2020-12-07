@@ -14,9 +14,6 @@ namespace CleanupUserProfile.ActionFactory
 
         public string ActionName => "CheckNotHidden";
 
-        public IAction GetAction(object value)
-        {
-            return new CheckNotHiddenAction(_fileSystemOperator, value as string);
-        }
+        public IAction GetAction(object value) => new CheckNotHiddenAction(_fileSystemOperator, value as string);
     }
 }
