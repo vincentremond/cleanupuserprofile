@@ -130,3 +130,9 @@
       Name: REGEX:^\d{4}$
       Directories:
       - Ignore: REGEX:^\d{4}\.\d{2}$
+- Name: 'G:\My Drive'
+  Directories:
+  - Ignore: BAK
+  - Ignore: BOD
+  Files:
+  - Ignore: editorconfig.gsheet
