@@ -82,6 +82,12 @@
       - RemoveSymbolicLink: My Music
       - RemoveSymbolicLink: My Pictures
       - RemoveSymbolicLink: My Videos
+      - Directory:
+          Name: Voicemeeter
+          Self: CheckHidden
+          Files:
+          - Remove: REGEX:\.wav$
+          - Ignore: REGEX:\.xml$
   - Directory:
       Name: REGEX:^Google\s*Drive$
       Directories:
