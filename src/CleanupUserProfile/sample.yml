@@ -49,6 +49,7 @@
   - CheckEmptyDirectoryAndHide: 3D Objects
   - CheckEmptyDirectoryAndHide: Contacts
   - CheckEmptyDirectoryAndHide: Saved Games
+  - CheckEmptyDirectoryAndRemove: dwhelper
   - Directory:
       Name: Documents
       Files:
