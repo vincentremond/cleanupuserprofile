@@ -117,6 +117,7 @@
       - Remove: REGEX:\.lnk$
 - Name: 'D:\DAT\'
   Directories:
+  - Ignore: logs
   - Directory:
       Name: MergeRequestReview
       Directories:
