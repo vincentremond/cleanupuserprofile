@@ -68,7 +68,7 @@
       - Remove: My Received Files
       - Remove: My Web Sites
       - Remove: Outlook Files
-      - Remove: SQL Server Management Studio
+      - CheckHidden: SQL Server Management Studio
       - Remove: Visual Studio 2015
       - Remove: Visual Studio 2017
       - Remove: Visual Studio 2019
