@@ -126,6 +126,7 @@
       Name: FIXObs
       Directories:
       - QuietRemove: REGEX:.*
+- Name: 'D:\GIT\'
 - Name: 'D:\TMP\'
   Directories:
   - Directory:
