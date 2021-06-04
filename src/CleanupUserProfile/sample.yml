@@ -5,7 +5,7 @@
   - CheckHidden: REGEX:^[_\.][\w\d\.-]+$
   - Remove: coffeelint.json
   - Remove: tslint.json
-  - Remove: Sti_Trace.log
+  - CheckHidden: Sti_Trace.log
   - Remove: REGEX:^\.v8flags\..+\.json
   - Remove: REGEX:^tmp[\w\d\.-]+.pem
   Directories:
@@ -55,12 +55,16 @@
       Files:
       - CheckHidden: Default.rdp
       Directories:
+      - CheckEmptyDirectoryAndRemove: Audacity
+      - CheckEmptyDirectoryAndRemove: vcam
+      - CheckEmptyDirectoryAndRemove: Zoom
+      - CheckHidden: SQL Server Management Studio
+      - Ignore: Fusion 360
       - Ignore: GIT
       - Ignore: Mes sources de données
       - Ignore: WindowsPowerShell
-      - Ignore: Fusion 360
-      - Remove: Downloads
       - Remove: Custom Office Templates
+      - Remove: Downloads
       - Remove: Fiddler2
       - Remove: IISExpress
       - Remove: Mes fichiers reçus
@@ -68,13 +72,10 @@
       - Remove: My Received Files
       - Remove: My Web Sites
       - Remove: Outlook Files
-      - CheckHidden: SQL Server Management Studio
       - Remove: Visual Studio 2015
       - Remove: Visual Studio 2017
       - Remove: Visual Studio 2019
-      - CheckEmptyDirectoryAndRemove: Audacity
-      - CheckEmptyDirectoryAndRemove: vcam
-      - CheckEmptyDirectoryAndRemove: Zoom
+      - Remove: XSplit
       # FR
       - RemoveSymbolicLink: Ma musique
       - RemoveSymbolicLink: Mes images
@@ -118,6 +119,7 @@
 - Name: 'D:\DAT\'
   Directories:
   - Ignore: logs
+  - Ignore: archives
   - Directory:
       Name: MergeRequestReview
       Directories:
@@ -139,3 +141,5 @@
   - Ignore: BOD
   Files:
   - Ignore: editorconfig.gsheet
+  - Ignore: GitLab − Time lost.gform
+  - Ignore: GitLab − Time lost (Responses).gsheet
