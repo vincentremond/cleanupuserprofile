@@ -108,6 +108,7 @@
       - CheckEmptyDirectoryAndHide: Saved Pictures
       - CheckEmptyDirectoryAndHide: Screenshots
       - Ignore: Screenpresso
+      - Ignore: Unsplash
   - Directory:
       Name: Videos
       Directories:
