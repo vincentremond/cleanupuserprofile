@@ -140,7 +140,9 @@
   Directories:
   - Ignore: BAK
   - Ignore: BOD
+  - Ignore: GSuite
   Files:
   - Ignore: editorconfig.gsheet
   - Ignore: GitLab − Time lost.gform
   - Ignore: GitLab − Time lost (Responses).gsheet
+  - Ignore: PCI proxy connectors.gsheet
