@@ -59,6 +59,7 @@
       - CheckEmptyDirectoryAndRemove: vcam
       - CheckEmptyDirectoryAndRemove: Zoom
       - CheckHidden: SQL Server Management Studio
+      - CheckHidden: Promote Application Data
       - Ignore: Fusion 360
       - Ignore: GIT
       - Ignore: Mes sources de données
