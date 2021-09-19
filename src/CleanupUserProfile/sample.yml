@@ -6,6 +6,7 @@
   - Remove: coffeelint.json
   - Remove: tslint.json
   - CheckHidden: Sti_Trace.log
+  - CheckHidden: mercurial.ini
   - Remove: REGEX:^\.v8flags\..+\.json
   - Remove: REGEX:^tmp[\w\d\.-]+.pem
   Directories:
@@ -122,6 +123,7 @@
   Directories:
   - Ignore: logs
   - Ignore: archives
+  - Ignore: docker
   - Directory:
       Name: MergeRequestReview
       Directories:
@@ -133,6 +135,7 @@
 - Name: 'D:\GIT\'
 - Name: 'D:\TMP\'
   Directories:
+  - Ignore: REGEX:^\d{4}\.\d{2}$
   - Directory:
       Name: REGEX:^\d{4}$
       Directories:
@@ -142,8 +145,4 @@
   - Ignore: BAK
   - Ignore: BOD
   - Ignore: GSuite
-  Files:
-  - Ignore: editorconfig.gsheet
-  - Ignore: GitLab − Time lost.gform
-  - Ignore: GitLab − Time lost (Responses).gsheet
-  - Ignore: PCI proxy connectors.gsheet
+  - Ignore: Shared
