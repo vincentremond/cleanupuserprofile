@@ -74,9 +74,7 @@
       - Remove: My Received Files
       - Remove: My Web Sites
       - Remove: Outlook Files
-      - Remove: Visual Studio 2015
-      - Remove: Visual Studio 2017
-      - Remove: Visual Studio 2019
+      - Remove: REGEX:^Visual Studio \d+$
       - Remove: XSplit
       # FR
       - RemoveSymbolicLink: Ma musique
