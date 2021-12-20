@@ -15,6 +15,7 @@
   - CheckHidden: Links
   - CheckHidden: MicrosoftEdgeBackups
   - CheckHidden: OpenVPN
+  - Remove: dotTraceSnapshots
   - Ignore: AppData
   - Ignore: Qa
   - RemoveSymbolicLink: Application Data
