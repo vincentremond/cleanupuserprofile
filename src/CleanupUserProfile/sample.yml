@@ -145,3 +145,6 @@
   - Ignore: BOD
   - Ignore: GSuite
   - Ignore: Shared
+- Name: 'C:\Users\Public\Desktop\'
+  Files:
+  - Remove: REGEX:\.lnk$
