@@ -47,6 +47,7 @@
       Directories:
       - CheckEmptyDirectory: repos
   - Remove: RiderProjects
+  - Remove: SoapUI-Tutorials
   - CheckEmptyDirectoryAndHide: Music
   - CheckEmptyDirectoryAndHide: 3D Objects
   - CheckEmptyDirectoryAndHide: Contacts
