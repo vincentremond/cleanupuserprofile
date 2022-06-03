@@ -122,9 +122,6 @@
       - Remove: REGEX:\.lnk$
 - Name: 'D:\DAT\'
   Directories:
-  - Ignore: logs
-  - Ignore: archives
-  - Ignore: docker
   - Directory:
       Name: MergeRequestReview
       Directories:
@@ -133,6 +130,7 @@
       Name: FIXObs
       Directories:
       - QuietRemove: REGEX:.*
+  - Ignore: REGEX:.*
 - Name: 'D:\GIT\'
 - Name: 'D:\TMP\'
   Directories:
