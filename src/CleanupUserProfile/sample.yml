@@ -16,6 +16,7 @@
   - CheckHidden: MicrosoftEdgeBackups
   - CheckHidden: OpenVPN
   - Remove: dotTraceSnapshots
+  - CheckEmptyDirectoryAndRemove: Creative Cloud Files
   - Ignore: AppData
   - Ignore: Qa
   - RemoveSymbolicLink: Application Data
