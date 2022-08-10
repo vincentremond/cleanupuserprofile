@@ -68,6 +68,7 @@
       - Ignore: GIT
       - Ignore: Mes sources de données
       - Ignore: WindowsPowerShell
+      - Ignore: PowerShell
       - Remove: Custom Office Templates
       - Remove: Downloads
       - Remove: Fiddler2
