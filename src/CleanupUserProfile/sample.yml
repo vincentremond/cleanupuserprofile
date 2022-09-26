@@ -142,10 +142,8 @@
       - Ignore: REGEX:^\d{4}\.\d{2}$
 - Name: 'G:\My Drive'
   Directories:
+  - Ignore: TMP
   - Ignore: BAK
-  - Ignore: BOD
-  - Ignore: GSuite
-  - Ignore: Shared
 - Name: 'C:\Users\Public\Desktop\'
   Files:
   - Remove: REGEX:\.lnk$
