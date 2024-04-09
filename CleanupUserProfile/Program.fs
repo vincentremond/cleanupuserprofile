@@ -37,8 +37,6 @@ and MatchRule =
 and NameRules =
     | StartsWith of string
     | StartsWithCaseSensitive of string
-    // | Like of string
-    // | LikeCaseSensitive of string
     | Match of string
     | Eq of string
     | EqCaseSensitive of string
@@ -52,6 +50,7 @@ let (</>) a b = Path.Combine(a, b)
 module ShortHands =
     let nameStartsWith prefix = When(Name(StartsWith prefix))
     let nameEquals value = When(Name(Eq value))
+    let nameMatch pattern = When(Name(Match pattern))
     let extensionEquals value = When(Extension value)
     let isSymLink = When(IsSymLink)
     let isHidden = When(IsHidden)
@@ -214,6 +213,16 @@ let subFolderWithAction name action foldersRules filesRules =
      ),
      nameEquals name)
 
+let subFolderWithAction' condition action foldersRules filesRules =
+    (SubFolderWithAction(
+        {
+            FolderRules = foldersRules
+            FileRules = filesToIgnore @ filesRules
+        },
+        action
+     ),
+     condition)
+
 processFolder userProfile [
     hide, (nameStartsWith ".") |+| (nameStartsWith @"_")
     ignore, (nameEquals @"AppData")
@@ -230,11 +239,17 @@ processFolder userProfile [
           |+| nameEquals @"Voisinage réseau"
           |+| nameEquals "Cookies"))
 
-    emptyFolder @"dotTraceSnapshots"
+    subFolderWithAction @"dotTraceSnapshots" Delete [
+        delete, nameEquals "Temp"
+        subFolderWithAction' (nameStartsWith "Unit Tests ") Delete [] [ delete, nameMatch @"\.tmp(\.\d+)?$" ]
+    ] []
     emptyFolderWithAction @"Contacts" Hide
-    emptyFolderWithAction @"Pictures" Hide
+    subFolderWithAction @"Pictures" Hide [ ignore, nameEquals "Screenpresso" ] []
     emptyFolderWithAction @"Music" Hide
-    subFolderWithAction @"Videos" Hide [ emptyFolder "Captures" ] []
+    subFolderWithAction @"Videos" Hide [
+        emptyFolder "Captures"
+        emptyFolderWithAction "AnyDesk" Delete
+    ] []
     subFolderWithAction @"Searches" Hide [] [ ignore, extensionEquals ".search-ms" ]
     emptyFolderWithAction @"Saved Games" Hide
     subFolder "Desktop" [] [ Do(Delete), extensionEquals ".lnk" ]
@@ -244,6 +259,8 @@ processFolder userProfile [
     ignore, nameEquals @"Perso"
     subFolder "nuget" [] [ ignore, extensionEquals @".nupkg" ]
     subFolder "Documents" [
+        emptyFolderWithAction "Custom Office Templates" Delete
+        ignore, nameEquals @"Fiddler2"
         subFolderWithAction "PowerToys" Delete [ emptyFolderWithAction "Backup" Delete ] []
         subFolder "Screenpresso" [
             subFolderWithAction "Originals" Delete [] [ delete, extensionEquals ".presso" ]
@@ -263,10 +280,12 @@ processFolder userProfile [
          |+| nameEquals "Visual Studio 2017"
          |+| nameEquals "Visual Studio 2022")
         emptyFolder "Fichiers Outlook"
+
     ] [ ignore, nameEquals "Default.rdp" ]
 
 ] [
     Do(Hide), When(Name(StartsWith "."))
+    Do(Hide), When(Name(StartsWith "_"))
     Do(Ignore), When(Name(StartsWith @"NTUSER."))
     Do(Hide), When(Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$"))
 ]
