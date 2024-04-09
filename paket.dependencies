@@ -1,0 +1,15 @@
+source https://api.nuget.org/v3/index.json
+
+storage: none
+nuget FSharp.Core
+
+group Tests
+
+storage: none
+source https://api.nuget.org/v3/index.json
+nuget coverlet.collector
+nuget FSharp.Core
+nuget Microsoft.NET.Test.Sdk
+nuget NUnit
+nuget NUnit.Analyzers
+nuget NUnit3TestAdapter
