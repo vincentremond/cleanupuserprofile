@@ -160,7 +160,8 @@ let rec genericProcess (type_: string) (items: FileSystemInfo list) (rules: (Met
                     processFolder dir subFolder.FolderRules subFolder.FileRules
                     applyAction action item
                     notProcessedList
-                | Some(SubFolderWithAction _), _ -> failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
+                | Some(SubFolderWithAction _), _ ->
+                    failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
                 | None, _ -> item :: notProcessedList
             )
             []
@@ -241,9 +242,7 @@ processFolder userProfile [
     hide, nameEquals @"IntelGraphicsProfiles"
     ignore, nameEquals @"Favorites"
     ignore, nameEquals @"Perso"
-    subFolder "nuget" [] [
-        ignore, extensionEquals @".nupkg"    
-    ]
+    subFolder "nuget" [] [ ignore, extensionEquals @".nupkg" ]
     subFolder "Documents" [
         subFolderWithAction "PowerToys" Delete [ emptyFolderWithAction "Backup" Delete ] []
         subFolder "Screenpresso" [
