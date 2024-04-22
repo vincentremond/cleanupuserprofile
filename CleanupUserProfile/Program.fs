@@ -226,6 +226,10 @@ let subFolderWithAction' condition action foldersRules filesRules =
 processFolder userProfile [
     hide, (nameStartsWith ".") |+| (nameStartsWith @"_")
     ignore, (nameEquals @"AppData")
+    ignore, (nameEquals @"repos")
+    ignore, (nameEquals @"tmp")
+    ignore, (nameEquals @"OneDrive")
+    ignore, (nameStartsWith @"OneDrive -")
     unlink,
     (isSymLink
      |&| (nameEquals @"Application Data"
@@ -244,23 +248,38 @@ processFolder userProfile [
         subFolderWithAction' (nameStartsWith "Unit Tests ") Delete [] [ delete, nameMatch @"\.tmp(\.\d+)?$" ]
     ] []
     emptyFolderWithAction @"Contacts" Hide
-    subFolderWithAction @"Pictures" Hide [ ignore, nameEquals "Screenpresso" ] []
+    subFolderWithAction @"Links" Hide [] [
+        ignore, extensionEquals ".lnk"
+    ]
+    subFolderWithAction @"Pictures" Hide [
+        ignore, nameEquals "Screenpresso"
+        emptyFolder "Camera Roll"
+        emptyFolder "Saved Pictures"
+    ] []
     emptyFolderWithAction @"Music" Hide
     subFolderWithAction @"Videos" Hide [
         emptyFolder "Captures"
         emptyFolderWithAction "AnyDesk" Delete
     ] []
-    subFolderWithAction @"Searches" Hide [] [ ignore, extensionEquals ".search-ms" ]
+    subFolderWithAction @"Searches" Hide [] [
+        ignore, extensionEquals ".search-ms"
+        ignore, extensionEquals ".searchconnector-ms"
+    ]
     emptyFolderWithAction @"Saved Games" Hide
+    emptyFolderWithAction @"ai_overlay_tmp" Hide
     subFolder "Desktop" [] [ Do(Delete), extensionEquals ".lnk" ]
     subFolderWithAction "Postman" Delete [ emptyFolderWithAction "files" Delete ] []
     hide, nameEquals @"IntelGraphicsProfiles"
     ignore, nameEquals @"Favorites"
     ignore, nameEquals @"Perso"
     subFolder "nuget" [] [ ignore, extensionEquals @".nupkg" ]
+    subFolderWithAction "source" Delete [
+        delete, nameEquals "repos"
+    ] []
     subFolder "Documents" [
         emptyFolderWithAction "Custom Office Templates" Delete
         ignore, nameEquals @"Fiddler2"
+        ignore, nameEquals @"Dell"
         subFolderWithAction "PowerToys" Delete [ emptyFolderWithAction "Backup" Delete ] []
         subFolder "Screenpresso" [
             subFolderWithAction "Originals" Delete [] [ delete, extensionEquals ".presso" ]
@@ -287,5 +306,6 @@ processFolder userProfile [
     Do(Hide), When(Name(StartsWith "."))
     Do(Hide), When(Name(StartsWith "_"))
     Do(Ignore), When(Name(StartsWith @"NTUSER."))
+    Do(Ignore), When(Name(Eq @"desktop.ini"))
     Do(Hide), When(Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$"))
 ]
