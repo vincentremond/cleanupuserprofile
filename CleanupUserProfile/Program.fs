@@ -226,10 +226,13 @@ let subFolderWithAction' condition action foldersRules filesRules =
 processFolder userProfile [
     hide, (nameStartsWith ".") |+| (nameStartsWith @"_")
     ignore, (nameEquals @"AppData")
+    ignore, (nameEquals @"Apps")
+    ignore, (nameEquals @"Data")
     ignore, (nameEquals @"repos")
     ignore, (nameEquals @"tmp")
     ignore, (nameEquals @"OneDrive")
     ignore, (nameStartsWith @"OneDrive -")
+    emptyFolder "Downloads"
     unlink,
     (isSymLink
      |&| (nameEquals @"Application Data"
