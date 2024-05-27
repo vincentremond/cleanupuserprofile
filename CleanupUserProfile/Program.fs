@@ -258,6 +258,7 @@ processFolder userProfile [
     subFolderWithAction @"Links" Hide [] [ ignore, extensionEquals ".lnk" ]
     subFolderWithAction @"Pictures" Hide [
         ignore, nameEquals "Screenpresso"
+        ignore, nameEquals "Wallpapers"
         emptyFolder "Camera Roll"
         emptyFolder "Saved Pictures"
         subFolderWithAction "Feedback" Delete [
