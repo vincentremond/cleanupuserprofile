@@ -159,8 +159,7 @@ let rec genericProcess (type_: string) (items: FileSystemInfo list) (rules: (Met
                     processFolder dir subFolder.FolderRules subFolder.FileRules
                     applyAction action item
                     notProcessedList
-                | Some(SubFolderWithAction _), _ ->
-                    failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
+                | Some(SubFolderWithAction _), _ -> failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
                 | None, _ -> item :: notProcessedList
             )
             []
@@ -236,28 +235,35 @@ processFolder userProfile [
     unlink,
     (isSymLink
      |&| (nameEquals @"Application Data"
+          |+| nameEquals @"Cookies"
           |+| nameEquals @"Local Settings"
-          |+| nameEquals @"Modèles"
           |+| nameEquals @"Menu Démarrer"
           |+| nameEquals @"Mes documents"
-          |+| nameEquals @"Voisinage d'impression"
-          |+| nameEquals @"SendTo"
+          |+| nameEquals @"Modèles"
+          |+| nameEquals @"My Documents"
+          |+| nameEquals @"NetHood"
+          |+| nameEquals @"PrintHood"
           |+| nameEquals @"Recent"
-          |+| nameEquals @"Voisinage réseau"
-          |+| nameEquals "Cookies"))
+          |+| nameEquals @"SendTo"
+          |+| nameEquals @"Start Menu"
+          |+| nameEquals @"Templates"
+          |+| nameEquals @"Voisinage d'impression"
+          |+| nameEquals @"Voisinage réseau"))
 
     subFolderWithAction @"dotTraceSnapshots" Delete [
         delete, nameEquals "Temp"
         subFolderWithAction' (nameStartsWith "Unit Tests ") Delete [] [ delete, nameMatch @"\.tmp(\.\d+)?$" ]
     ] []
     emptyFolderWithAction @"Contacts" Hide
-    subFolderWithAction @"Links" Hide [] [
-        ignore, extensionEquals ".lnk"
-    ]
+    subFolderWithAction @"Links" Hide [] [ ignore, extensionEquals ".lnk" ]
     subFolderWithAction @"Pictures" Hide [
         ignore, nameEquals "Screenpresso"
         emptyFolder "Camera Roll"
         emptyFolder "Saved Pictures"
+        subFolderWithAction "Feedback" Delete [
+            subFolderWithAction' (nameMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$") Delete [] [ delete, nameMatch @"\.png$" ]
+        ] []
+
     ] []
     emptyFolderWithAction @"Music" Hide
     subFolderWithAction @"Videos" Hide [
@@ -270,15 +276,16 @@ processFolder userProfile [
     ]
     emptyFolderWithAction @"Saved Games" Hide
     emptyFolderWithAction @"ai_overlay_tmp" Hide
-    subFolder "Desktop" [] [ Do(Delete), extensionEquals ".lnk" ]
+    subFolder "Desktop" [] [
+        Do(Delete), extensionEquals ".lnk"
+        Do(Delete), extensionEquals ".url"
+    ]
     subFolderWithAction "Postman" Delete [ emptyFolderWithAction "files" Delete ] []
     hide, nameEquals @"IntelGraphicsProfiles"
     ignore, nameEquals @"Favorites"
     ignore, nameEquals @"Perso"
     subFolder "nuget" [] [ ignore, extensionEquals @".nupkg" ]
-    subFolderWithAction "source" Delete [
-        delete, nameEquals "repos"
-    ] []
+    subFolderWithAction "source" Delete [ delete, nameEquals "repos" ] []
     subFolder "Documents" [
         emptyFolderWithAction "Custom Office Templates" Delete
         ignore, nameEquals @"Fiddler2"
@@ -293,7 +300,10 @@ processFolder userProfile [
         unlink,
         (nameEquals @"Ma musique"
          |+| nameEquals @"Mes images"
-         |+| nameEquals @"Mes vidéos")
+         |+| nameEquals @"Mes vidéos"
+         |+| nameEquals @"My Music"
+         |+| nameEquals @"My Pictures"
+         |+| nameEquals @"My Videos")
         ignore,
         (nameEquals "IISExpress"
          |+| nameEquals "PowerShell"
