@@ -313,10 +313,11 @@ processFolder userProfile [
          |+| nameEquals "Visual Studio 2017"
          |+| nameEquals "Visual Studio 2022")
         emptyFolder "Fichiers Outlook"
-
-    ] [ ignore, nameEquals "Default.rdp" ]
+        emptyFolder "Zoom"
+    ] [  ]
 
 ] [
+    ignore, nameEquals ".editorconfig"
     Do(Hide), When(Name(StartsWith "."))
     Do(Hide), When(Name(StartsWith "_"))
     Do(Ignore), When(Name(StartsWith @"NTUSER."))
