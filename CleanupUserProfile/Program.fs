@@ -26,40 +26,23 @@ and Condition =
     | Or of Condition * Condition
     | Not of Condition
 
+and StringRule =
+    | StartsWith of string
+    | Match of string
+    | Eq of string
+
 and MatchRule =
-    | Name of NameRules
-    | Extension of string
+    | Name of StringRule
+    | Extension of StringRule
     | IsSymLink
     | IsHidden
     | IsReadOnly
     | IsSystem
 
-and NameRules =
-    | StartsWith of string
-    | StartsWithCaseSensitive of string
-    | Match of string
-    | Eq of string
-    | EqCaseSensitive of string
-
 let (|&|) a b = And(a, b)
 let (|+|) a b = Or(a, b)
 
 let (</>) a b = Path.Combine(a, b)
-
-[<AutoOpen>]
-module ShortHands =
-    let nameStartsWith prefix = When(Name(StartsWith prefix))
-    let nameEquals value = When(Name(Eq value))
-    let nameMatch pattern = When(Name(Match pattern))
-    let extensionEquals value = When(Extension value)
-    let isSymLink = When(IsSymLink)
-    let isHidden = When(IsHidden)
-    let isReadOnly = When(IsReadOnly)
-    let isSystem = When(IsSystem)
-    let ignore = Do(Ignore)
-    let delete = Do(Delete)
-    let hide = Do(Hide)
-    let unlink = Do(Unlink)
 
 let specialFolders = {|
     UserProfile =
@@ -91,20 +74,20 @@ module String =
     let equalsCaseSensitive (str: string) (value: string) =
         str.Equals(value, StringComparison.CurrentCulture)
 
+let testStringRule str stringRule =
+    match stringRule with
+    | StartsWith prefix -> String.startsWith str prefix
+    | Match pattern -> pattern |> Regex |> Regex.isMatch str
+    | Eq value -> String.equals str value
+
 let testRule rule (item: FileSystemInfo) =
     match rule with
-    | Name condition ->
-        match condition with
-        | StartsWith prefix -> String.startsWith item.Name prefix
-        | StartsWithCaseSensitive prefix -> String.startsWithCaseSensitive item.Name prefix
-        | Match pattern -> pattern |> Regex |> Regex.isMatch item.Name
-        | Eq value -> String.equals item.Name value
-        | EqCaseSensitive value -> String.equalsCaseSensitive item.Name value
+    | Name stringRule -> testStringRule item.Name stringRule
     | IsSymLink -> item.Attributes.HasFlag(FileAttributes.ReparsePoint)
     | IsHidden -> item.Attributes.HasFlag(FileAttributes.Hidden)
     | IsReadOnly -> item.Attributes.HasFlag(FileAttributes.ReadOnly)
     | IsSystem -> item.Attributes.HasFlag(FileAttributes.System)
-    | Extension extension -> String.equals item.Extension extension
+    | Extension stringRule -> testStringRule item.Extension stringRule
 
 let rec testCondition (condition: Condition) (item: FileSystemInfo) =
     match condition with
@@ -173,9 +156,9 @@ and processFolder (folder: DirectoryInfo) folderRules fileRules =
 
 let filesToIgnore = [
     Do(Ignore),
-    (nameEquals @"desktop.ini" |+| nameEquals @"Thumbs.db")
-    |&| isHidden
-    |&| isSystem
+    (When(Name(Eq @"desktop.ini")) |+| When(Name(Eq @"Thumbs.db")))
+    |&| When(IsHidden)
+    |&| When(IsSystem)
 ]
 
 let emptyFolder name =
@@ -183,7 +166,7 @@ let emptyFolder name =
         FolderRules = []
         FileRules = filesToIgnore
      },
-     nameEquals name)
+     When(Name(Eq name)))
 
 let emptyFolderWithAction name action =
     (SubFolderWithAction(
@@ -193,14 +176,14 @@ let emptyFolderWithAction name action =
         },
         action
      ),
-     nameEquals name)
+     When(Name(Eq name)))
 
 let subFolder name foldersRules filesRules =
     (SubFolder {
         FolderRules = foldersRules
         FileRules = filesToIgnore @ filesRules
      },
-     nameEquals name)
+     When(Name(Eq name)))
 
 let subFolderWithAction name action foldersRules filesRules =
     (SubFolderWithAction(
@@ -210,7 +193,7 @@ let subFolderWithAction name action foldersRules filesRules =
         },
         action
      ),
-     nameEquals name)
+     When(Name(Eq name)))
 
 let subFolderWithAction' condition action foldersRules filesRules =
     (SubFolderWithAction(
@@ -223,46 +206,48 @@ let subFolderWithAction' condition action foldersRules filesRules =
      condition)
 
 processFolder userProfile [
-    hide, (nameStartsWith ".") |+| (nameStartsWith @"_")
-    ignore, (nameEquals @"AppData")
-    ignore, (nameEquals @"Apps")
-    ignore, (nameEquals @"Data")
-    ignore, (nameEquals @"repos")
-    ignore, (nameEquals @"tmp")
-    ignore, (nameEquals @"OneDrive")
-    ignore, (nameStartsWith @"OneDrive -")
+    Do(Hide), When(Name(StartsWith("."))) |+| When(Name(StartsWith("_")))
+    Do(Ignore), When(Name(Eq @"AppData"))
+    Do(Ignore), When(Name(Eq @"Apps"))
+    Do(Ignore), When(Name(Eq @"Data"))
+    Do(Ignore), When(Name(Eq @"repos"))
+    Do(Ignore), When(Name(Eq @"tmp"))
+    Do(Ignore), When(Name(Eq @"OneDrive"))
+    Do(Ignore), When(Name(StartsWith("OneDrive -")))
     emptyFolder "Downloads"
-    unlink,
-    (isSymLink
-     |&| (nameEquals @"Application Data"
-          |+| nameEquals @"Cookies"
-          |+| nameEquals @"Local Settings"
-          |+| nameEquals @"Menu Démarrer"
-          |+| nameEquals @"Mes documents"
-          |+| nameEquals @"Modèles"
-          |+| nameEquals @"My Documents"
-          |+| nameEquals @"NetHood"
-          |+| nameEquals @"PrintHood"
-          |+| nameEquals @"Recent"
-          |+| nameEquals @"SendTo"
-          |+| nameEquals @"Start Menu"
-          |+| nameEquals @"Templates"
-          |+| nameEquals @"Voisinage d'impression"
-          |+| nameEquals @"Voisinage réseau"))
+    Do(Unlink),
+    (When(IsSymLink)
+     |&| (When(Name(Eq @"Application Data"))
+          |+| When(Name(Eq @"Cookies"))
+          |+| When(Name(Eq @"Local Settings"))
+          |+| When(Name(Eq @"Menu Démarrer"))
+          |+| When(Name(Eq @"Mes documents"))
+          |+| When(Name(Eq @"Modèles"))
+          |+| When(Name(Eq @"My Documents"))
+          |+| When(Name(Eq @"NetHood"))
+          |+| When(Name(Eq @"PrintHood"))
+          |+| When(Name(Eq @"Recent"))
+          |+| When(Name(Eq @"SendTo"))
+          |+| When(Name(Eq @"Start Menu"))
+          |+| When(Name(Eq @"Templates"))
+          |+| When(Name(Eq @"Voisinage d'impression"))
+          |+| When(Name(Eq @"Voisinage réseau"))))
 
     subFolderWithAction @"dotTraceSnapshots" Delete [
-        delete, nameEquals "Temp"
-        subFolderWithAction' (nameStartsWith "Unit Tests ") Delete [] [ delete, nameMatch @"\.tmp(\.\d+)?$" ]
+        Do(Delete), When(Name(Eq "Temp"))
+        subFolderWithAction' (When(Name(StartsWith("Unit Tests ")))) Delete [] [ Do(Delete), When(Name(Match @"\.tmp(\.\d+)?$")) ]
     ] []
     emptyFolderWithAction @"Contacts" Hide
-    subFolderWithAction @"Links" Hide [] [ ignore, extensionEquals ".lnk" ]
+    subFolderWithAction @"Links" Hide [] [ Do(Ignore), When(Extension(Eq ".lnk")) ]
     subFolderWithAction @"Pictures" Hide [
-        ignore, nameEquals "Screenpresso"
-        ignore, nameEquals "Wallpapers"
+        Do(Ignore), When(Name(Eq @"Screenpresso"))
+        Do(Ignore), When(Name(Eq "Wallpapers"))
         emptyFolder "Camera Roll"
         emptyFolder "Saved Pictures"
         subFolderWithAction "Feedback" Delete [
-            subFolderWithAction' (nameMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$") Delete [] [ delete, nameMatch @"\.png$" ]
+            subFolderWithAction' (When(Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$"))) Delete [] [
+                Do(Delete), When(Name(Match @"\.png$"))
+            ]
         ] []
 
     ] []
@@ -272,52 +257,52 @@ processFolder userProfile [
         emptyFolderWithAction "AnyDesk" Delete
     ] []
     subFolderWithAction @"Searches" Hide [] [
-        ignore, extensionEquals ".search-ms"
-        ignore, extensionEquals ".searchconnector-ms"
+        Do(Ignore), When(Extension(Eq ".search-ms"))
+        Do(Ignore), When(Extension(Eq ".searchconnector-ms"))
     ]
     emptyFolderWithAction @"Saved Games" Hide
     emptyFolderWithAction @"ai_overlay_tmp" Hide
     subFolder "Desktop" [] [
-        Do(Delete), extensionEquals ".lnk"
-        Do(Delete), extensionEquals ".url"
+        Do(Delete), When(Extension(Eq ".lnk"))
+        Do(Delete), When(Extension(Eq ".url"))
     ]
     subFolderWithAction "Postman" Delete [ emptyFolderWithAction "files" Delete ] []
-    hide, nameEquals @"IntelGraphicsProfiles"
-    ignore, nameEquals @"Favorites"
-    ignore, nameEquals @"Perso"
-    subFolder "nuget" [] [ ignore, extensionEquals @".nupkg" ]
-    subFolderWithAction "source" Delete [ delete, nameEquals "repos" ] []
+    Do(Hide), When(Name(Eq @"IntelGraphicsProfiles"))
+    Do(Ignore), When(Name(Eq @"Favorites"))
+    Do(Ignore), When(Name(Eq @"Perso"))
+    subFolder "nuget" [] [ Do(Ignore), When(Extension(Eq ".nupkg")) ]
+    subFolderWithAction "source" Delete [ Do(Delete), When(Name(Eq "repos")) ] []
     subFolder "Documents" [
         emptyFolderWithAction "Custom Office Templates" Delete
-        ignore, nameEquals @"Fiddler2"
-        ignore, nameEquals @"Dell"
+        Do(Ignore), When(Name(Eq @"Fiddler2"))
+        Do(Ignore), When(Name(Eq @"Dell"))
         subFolderWithAction "PowerToys" Delete [ emptyFolderWithAction "Backup" Delete ] []
         subFolder "Screenpresso" [
-            subFolderWithAction "Originals" Delete [] [ delete, extensionEquals ".presso" ]
-            subFolder "Thumbnails" [] [ ignore, extensionEquals ".png" ]
+            subFolderWithAction "Originals" Delete [] [ Do(Delete), When(Extension(Eq ".presso")) ]
+            subFolder "Thumbnails" [] [ Do(Ignore), When(Extension(Eq ".png")) ]
 
-        ] [ ignore, extensionEquals ".png" ]
+        ] [ Do(Ignore), When(Extension(Eq ".png")) ]
 
-        unlink,
-        (nameEquals @"Ma musique"
-         |+| nameEquals @"Mes images"
-         |+| nameEquals @"Mes vidéos"
-         |+| nameEquals @"My Music"
-         |+| nameEquals @"My Pictures"
-         |+| nameEquals @"My Videos")
-        ignore,
-        (nameEquals "IISExpress"
-         |+| nameEquals "PowerShell"
-         |+| nameEquals "WindowsPowerShell"
-         |+| nameEquals "My Web Sites"
-         |+| nameEquals "Visual Studio 2017"
-         |+| nameEquals "Visual Studio 2022")
+        Do(Unlink),
+        (When(Name(Eq @"Ma musique"))
+         |+| When(Name(Eq @"Mes images"))
+         |+| When(Name(Eq @"Mes vidéos"))
+         |+| When(Name(Eq @"My Music"))
+         |+| When(Name(Eq @"My Pictures"))
+         |+| When(Name(Eq @"My Videos")))
+        Do(Ignore),
+        (When(Name(Eq "IISExpress"))
+         |+| When(Name(Eq "PowerShell"))
+         |+| When(Name(Eq "WindowsPowerShell"))
+         |+| When(Name(Eq "My Web Sites"))
+         |+| When(Name(Eq "Visual Studio 2017"))
+         |+| When(Name(Eq "Visual Studio 2022")))
         emptyFolder "Fichiers Outlook"
         emptyFolder "Zoom"
-    ] [  ]
+    ] []
 
 ] [
-    ignore, nameEquals ".editorconfig"
+    Do(Ignore), When(Name(Eq ".editorconfig"))
     Do(Hide), When(Name(StartsWith "."))
     Do(Hide), When(Name(StartsWith "_"))
     Do(Ignore), When(Name(StartsWith @"NTUSER."))
