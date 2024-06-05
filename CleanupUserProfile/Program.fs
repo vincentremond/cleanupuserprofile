@@ -2,31 +2,29 @@
 open System.IO
 open System.Text.RegularExpressions
 
-type Rule = MetaAction * Condition
-
-and MetaAction =
-    // TODO VRM remove MetaAction
-    | Do of Action
-    | SubFolder of SubFolder
-    | SubFolderWithAction of SubFolder * Action
-
-and SubFolder = {
-    FolderRules: Rule list
-    FileRules: Rule list
+type FileRule = {
+    Condition: Condition
+    Action: Action
 }
+
+and FolderRule = {
+    Condition: Condition
+    SelfAction: Action
+    FolderChildRules: FolderChildRules
+}
+
+and FolderChildRules =
+    | Noop
+    | Process of FolderRule list * FileRule list
 
 and Action =
     | Hide
-    | Ignore
+    | Noop
     | Unlink
     | Delete
 
-and StringRule =
-    | StartsWith of string
-    | Match of string
-    | Eq of string
-
 and Condition =
+    | Any
     | Name of StringRule
     | Extension of StringRule
     | IsSymLink
@@ -37,6 +35,11 @@ and Condition =
     | Or of Condition list
     | Not of Condition
 
+and StringRule =
+    | StartsWith of string
+    | Match of string
+    | Eq of string
+
 let (</>) a b = Path.Combine(a, b)
 
 let specialFolders = {|
@@ -44,7 +47,6 @@ let specialFolders = {|
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
         |> DirectoryInfo
     Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) |> DirectoryInfo
-
 |}
 
 let userProfile =
@@ -77,6 +79,7 @@ let testStringRule str stringRule =
 
 let rec testCondition rule (item: FileSystemInfo) =
     match rule with
+    | Any -> true
     | Name stringRule -> testStringRule item.Name stringRule
     | IsSymLink -> item.Attributes.HasFlag(FileAttributes.ReparsePoint)
     | IsHidden -> item.Attributes.HasFlag(FileAttributes.Hidden)
@@ -93,7 +96,7 @@ let applyAction (action: Action) (item: FileSystemInfo) =
         if not <| item.Attributes.HasFlag(FileAttributes.Hidden) then
             printfn $"Hiding \"{item.FullName}\""
             item.Attributes <- item.Attributes ||| FileAttributes.Hidden
-    | Ignore -> ()
+    | Noop -> ()
     | Unlink ->
         printfn $"Unlinking \"{item.FullName}\""
         item.Delete()
@@ -107,213 +110,185 @@ let applyAction (action: Action) (item: FileSystemInfo) =
             file.Delete()
         | _ -> failwith "Cannot delete something that is not a DirectoryInfo or a FileInfo"
 
-let rec genericProcess (type_: string) (items: FileSystemInfo list) (rules: (MetaAction * Condition) list) : unit =
-    let notProcessedItems =
-        items
-        |> List.fold
-            (fun notProcessedList item ->
-                let metaAction =
-                    rules
-                    |> List.tryPick (fun (metaAction, condition) ->
-                        if testCondition condition item then
-                            Some metaAction
-                        else
-                            None
-                    )
+let rec run (folder: DirectoryInfo) (foldersRules: FolderRule list) (filesRules: FileRule list) =
 
-                match metaAction, item with
-                | Some(Do action), _ ->
-                    applyAction action item
-                    notProcessedList
-                | Some(SubFolder subFolder), (:? DirectoryInfo as dir) ->
-                    processFolder dir subFolder.FolderRules subFolder.FileRules
-                    notProcessedList
-                | Some(SubFolder _), _ -> failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
-                | Some(SubFolderWithAction(subFolder, action)), (:? DirectoryInfo as dir) ->
-                    processFolder dir subFolder.FolderRules subFolder.FileRules
-                    applyAction action item
-                    notProcessedList
-                | Some(SubFolderWithAction _), _ -> failwith "Cannot process SubFolder on something that is not a DirectoryInfo"
-                | None, _ -> item :: notProcessedList
+    folder.GetDirectories()
+    |> Seq.iter (fun dirInfo ->
+        let rule =
+            foldersRules
+            |> List.tryPick (fun folderRule ->
+                if testCondition folderRule.Condition dirInfo then
+                    Some folderRule
+                else
+                    None
             )
-            []
 
-    for item in notProcessedItems |> List.rev do
-        printfn $"What to do with : {type_} {item}"
+        match rule with
+        | Some folderRule ->
 
-and processFolder (folder: DirectoryInfo) folderRules fileRules =
-    genericProcess "DIR " (folder.GetDirectories() |> Seq.cast<FileSystemInfo> |> Seq.toList) folderRules
-    genericProcess "FILE" (folder.GetFiles() |> Seq.cast<FileSystemInfo> |> Seq.toList) fileRules
+            match folderRule.FolderChildRules with
+            | FolderChildRules.Process(foldersRules, filesRules) -> run dirInfo foldersRules filesRules
+            | FolderChildRules.Noop -> ()
 
-let filesToIgnore = [
-    Do(Ignore),
+            applyAction folderRule.SelfAction dirInfo
 
-    And [
-        Or [
-            Name(Eq @"desktop.ini")
-            Name(Eq @"Thumbs.db")
-        ]
-        IsHidden
-        IsSystem
-    ]
-]
+        | None -> printfn $"What to do with DIR  {dirInfo}"
+    )
 
-let emptyFolder name =
-    (SubFolder {
-        FolderRules = []
-        FileRules = filesToIgnore
-     },
-     Name(Eq name))
+    folder.GetFiles()
+    |> Seq.iter (fun fileInfo ->
 
-let emptyFolderWithAction name action =
-    (SubFolderWithAction(
-        {
-            FolderRules = []
-            FileRules = filesToIgnore
-        },
-        action
-     ),
-     Name(Eq name))
+        if testCondition (Name(Eq "desktop.ini")) fileInfo then
+            ()
+        else
 
-let subFolder name foldersRules filesRules =
-    (SubFolder {
-        FolderRules = foldersRules
-        FileRules = filesToIgnore @ filesRules
-     },
-     Name(Eq name))
+            let rule =
+                filesRules
+                |> List.tryPick (fun fileRule ->
+                    if testCondition fileRule.Condition fileInfo then
+                        Some fileRule
+                    else
+                        None
+                )
 
-let subFolderWithAction name action foldersRules filesRules =
-    (SubFolderWithAction(
-        {
-            FolderRules = foldersRules
-            FileRules = filesToIgnore @ filesRules
-        },
-        action
-     ),
-     Name(Eq name))
+            match rule with
+            | Some fileRule -> applyAction fileRule.Action fileInfo
+            | None -> printfn $"What to do with FILE {fileInfo}"
+    )
 
-let subFolderWithAction' condition action foldersRules filesRules =
-    (SubFolderWithAction(
-        {
-            FolderRules = foldersRules
-            FileRules = filesToIgnore @ filesRules
-        },
-        action
-     ),
-     condition)
+let file condition action = {
+    Condition = condition
+    Action = action
+}
 
-processFolder userProfile [
-    Do(Hide),
-    Or [
-        Name(StartsWith("."))
-        Name(StartsWith("_"))
-    ]
-    Do(Ignore), Name(Eq @"AppData")
-    Do(Ignore), Name(Eq @"Apps")
-    Do(Ignore), Name(Eq @"Data")
-    Do(Ignore), Name(Eq @"repos")
-    Do(Ignore), Name(Eq @"tmp")
-    Do(Ignore), Name(Eq @"OneDrive")
-    Do(Ignore), Name(StartsWith("OneDrive -"))
-    emptyFolder "Downloads"
-    Do(Unlink),
-    And [
-        IsSymLink
-        Or [
-            Name(Eq @"Application Data")
-            Name(Eq @"Cookies")
-            Name(Eq @"Local Settings")
-            Name(Eq @"Menu Démarrer")
-            Name(Eq @"Mes documents")
-            Name(Eq @"Modèles")
-            Name(Eq @"My Documents")
-            Name(Eq @"NetHood")
-            Name(Eq @"PrintHood")
-            Name(Eq @"Recent")
-            Name(Eq @"SendTo")
-            Name(Eq @"Start Menu")
-            Name(Eq @"Templates")
-            Name(Eq @"Voisinage d'impression")
-            Name(Eq @"Voisinage réseau")
-        ]
-    ]
-    subFolderWithAction @"dotTraceSnapshots" Delete [
-        Do(Delete), Name(Eq "Temp")
-        subFolderWithAction' (Name(StartsWith("Unit Tests "))) Delete [] [ Do(Delete), Name(Match @"\.tmp(\.\d+)?$") ]
-    ] []
-    emptyFolderWithAction @"Contacts" Hide
-    subFolderWithAction @"Links" Hide [] [ Do(Ignore), Extension(Eq ".lnk") ]
-    subFolderWithAction @"Pictures" Hide [
-        Do(Ignore), Name(Eq @"Screenpresso")
-        Do(Ignore), Name(Eq "Wallpapers")
-        emptyFolder "Camera Roll"
-        emptyFolder "Saved Pictures"
-        subFolderWithAction "Feedback" Delete [
-            subFolderWithAction' (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [
-                Do(Delete), Name(Match @"\.png$")
+let dir condition action childFoldersRules childFilesRules = {
+    Condition = condition
+    SelfAction = action
+    FolderChildRules = FolderChildRules.Process(childFoldersRules, childFilesRules)
+}
+
+let dir' condition action = {
+    Condition = condition
+    SelfAction = action
+    FolderChildRules = FolderChildRules.Noop
+}
+
+let ignoreFolders = [ dir Any ]
+
+run userProfile [
+    dir'
+        (Or [
+            Name(StartsWith ".")
+            Name(StartsWith "_")
+        ])
+        Hide
+    dir'
+        (Or [
+            Name(Eq "AppData")
+            Name(Eq "Apps")
+            Name(Eq "Data")
+            Name(Eq "repos")
+            Name(Eq "tmp")
+            Name(Eq "OneDrive")
+            Name(StartsWith "OneDrive -")
+        ])
+        Noop
+    dir (Name(Eq "Downloads")) Noop [] []
+    dir
+        (And [
+            IsSymLink
+            Or [
+                Name(Eq @"Application Data")
+                Name(Eq @"Cookies")
+                Name(Eq @"Local Settings")
+                Name(Eq @"Menu Démarrer")
+                Name(Eq @"Mes documents")
+                Name(Eq @"Modèles")
+                Name(Eq @"My Documents")
+                Name(Eq @"NetHood")
+                Name(Eq @"PrintHood")
+                Name(Eq @"Recent")
+                Name(Eq @"SendTo")
+                Name(Eq @"Start Menu")
+                Name(Eq @"Templates")
+                Name(Eq @"Voisinage d'impression")
+                Name(Eq @"Voisinage réseau")
             ]
+        ])
+        Unlink [] []
+    dir (Name(Eq "dotTraceSnapshots")) Delete [
+        dir (Name(Eq "Temp")) Delete [] []
+        dir (Name(StartsWith "Unit Tests ")) Delete [] [ file (Name(Match @"\.tmp(\.\d+)?$")) Delete ]
+    ] []
+    dir (Name(Eq "Contacts")) Hide [] []
+    dir (Name(Eq "Links")) Hide [] [ file (Extension(Eq ".lnk")) Noop ]
+    dir (Name(Eq "Pictures")) Hide [
+        dir' (Name(Eq "Screenpresso")) Noop
+        dir (Name(Eq "Wallpapers")) Noop [] []
+        dir (Name(Eq "Camera Roll")) Noop [] []
+        dir (Name(Eq "Saved Pictures")) Noop [] []
+        dir (Name(Eq "Feedback")) Delete [
+            dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ file (Name(Match @"\.png$")) Delete ]
         ] []
-
     ] []
-    emptyFolderWithAction @"Music" Hide
-    subFolderWithAction @"Videos" Hide [
-        emptyFolder "Captures"
-        emptyFolderWithAction "AnyDesk" Delete
+    dir (Name(Eq "Music")) Hide [] []
+    dir (Name(Eq "Videos")) Hide [
+        dir (Name(Eq "Captures")) Noop [] [ file (Extension(Eq ".mp4")) Delete ]
+        dir (Name(Eq "AnyDesk")) Delete [] []
     ] []
-    subFolderWithAction @"Searches" Hide [] [
-        Do(Ignore), Extension(Eq ".search-ms")
-        Do(Ignore), Extension(Eq ".searchconnector-ms")
+    dir (Name(Eq "Searches")) Hide [] [
+        file (Extension(Eq ".search-ms")) Noop
+        file (Extension(Eq ".searchconnector-ms")) Noop
     ]
-    emptyFolderWithAction @"Saved Games" Hide
-    emptyFolderWithAction @"ai_overlay_tmp" Hide
-    subFolder "Desktop" [] [
-        Do(Delete), Extension(Eq ".lnk")
-        Do(Delete), Extension(Eq ".url")
+    dir (Name(Eq "Saved Games")) Hide [] []
+    dir (Name(Eq "ai_overlay_tmp")) Hide [] []
+    dir (Name(Eq "Desktop")) Noop [] [
+        file (Extension(Eq ".lnk")) Delete
+        file (Extension(Eq ".url")) Delete
     ]
-    subFolderWithAction "Postman" Delete [ emptyFolderWithAction "files" Delete ] []
-    Do(Hide), Name(Eq @"IntelGraphicsProfiles")
-    Do(Ignore), Name(Eq @"Favorites")
-    Do(Ignore), Name(Eq @"Perso")
-    subFolder "nuget" [] [ Do(Ignore), Extension(Eq ".nupkg") ]
-    subFolderWithAction "source" Delete [ Do(Delete), Name(Eq "repos") ] []
-    subFolder "Documents" [
-        emptyFolderWithAction "Custom Office Templates" Delete
-        Do(Ignore), Name(Eq @"Fiddler2")
-        Do(Ignore), Name(Eq @"Dell")
-        subFolderWithAction "PowerToys" Delete [ emptyFolderWithAction "Backup" Delete ] []
-        subFolder "Screenpresso" [
-            subFolderWithAction "Originals" Delete [] [ Do(Delete), Extension(Eq ".presso") ]
-            subFolder "Thumbnails" [] [ Do(Ignore), Extension(Eq ".png") ]
-
-        ] [ Do(Ignore), Extension(Eq ".png") ]
-
-        Do(Unlink),
-        Or [
-            Name(Eq @"Ma musique")
-            Name(Eq @"Mes images")
-            Name(Eq @"Mes vidéos")
-            Name(Eq @"My Music")
-            Name(Eq @"My Pictures")
-            Name(Eq @"My Videos")
-        ]
-        Do(Ignore),
-        Or [
-            Name(Eq "IISExpress")
-            Name(Eq "PowerShell")
-            Name(Eq "WindowsPowerShell")
-            Name(Eq "My Web Sites")
-            Name(Eq "Visual Studio 2017")
-            Name(Eq "Visual Studio 2022")
-        ]
-        emptyFolder "Fichiers Outlook"
-        emptyFolder "Zoom"
-    ] []
-
+    dir' (Name(Eq "Favorites")) Noop
+    dir' (Name(Eq "IntelGraphicsProfiles")) Hide
+    dir' (Name(Eq "Perso")) Noop
+    dir (Name(Eq "Postman")) Delete [ dir (Name(Eq "files")) Delete [] [] ] []
+    dir (Name(Eq "nuget")) Noop [] [ file (Extension(Eq ".nupkg")) Noop ]
+    dir (Name(Eq "source")) Delete [ dir (Name(Eq "repos")) Delete [] [] ] []
+    dir (Name(Eq "Documents")) Noop [
+        dir (Name(Eq "Custom Office Templates")) Delete [] []
+        dir' (Name(Eq "Fiddler2")) Noop
+        dir' (Name(Eq "Dell")) Noop
+        dir (Name(Eq "PowerToys")) Delete [ dir (Name(Eq "Backup")) Delete [] [] ] []
+        dir
+            (Or [
+                Name(Eq "Ma musique")
+                Name(Eq "Mes images")
+                Name(Eq "Mes vidéos")
+                Name(Eq "My Music")
+                Name(Eq "My Pictures")
+                Name(Eq "My Videos")
+            ])
+            Unlink [] []
+        dir'
+            (Or [
+                Name(Eq "IISExpress")
+                Name(Eq "PowerShell")
+                Name(Eq "WindowsPowerShell")
+                Name(Eq "My Web Sites")
+                Name(Eq "Visual Studio 2017")
+                Name(Eq "Visual Studio 2022")
+            ])
+            Noop
+        dir (Name(Eq "Fichiers Outlook")) Noop [] []
+        dir (Name(Eq "Zoom")) Noop [] []
+    ] [ file (Name(Eq "Default.rdp")) Hide ]
 ] [
-    Do(Ignore), Name(Eq ".editorconfig")
-    Do(Hide), Name(StartsWith ".")
-    Do(Hide), Name(StartsWith "_")
-    Do(Ignore), Name(StartsWith @"NTUSER.")
-    Do(Ignore), Name(Eq @"desktop.ini")
-    Do(Hide), Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$")
+    file (Name(Eq ".editorconfig")) Noop
+    file
+        (Or [
+            Name(StartsWith ".")
+            Name(StartsWith "_")
+        ])
+        Hide
+
+    file (Name(StartsWith @"NTUSER.")) Noop
+    file (Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$")) Hide
 ]
