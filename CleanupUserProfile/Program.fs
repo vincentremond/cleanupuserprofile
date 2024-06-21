@@ -146,8 +146,7 @@ and runFolders folder foldersRules : FileSystemInfo list =
 
             childResults
 
-        | None ->
-            [ (dirInfo :> FileSystemInfo) ]
+        | None -> [ (dirInfo :> FileSystemInfo) ]
     )
     |> Seq.toList
 
@@ -172,8 +171,7 @@ and runFiles folder filesRules : FileSystemInfo list =
             | Some fileRule ->
                 applyAction fileRule.Action fileInfo
                 None
-            | None ->
-                Some(fileInfo :> FileSystemInfo)
+            | None -> Some(fileInfo :> FileSystemInfo)
     )
     |> Seq.toList
 
@@ -210,11 +208,14 @@ let notProcessedItems =
                 Name(Eq "Apps")
                 Name(Eq "Data")
                 Name(Eq "repos")
-                Name(Eq "tmp")
                 Name(Eq "OneDrive")
                 Name(StartsWith "OneDrive -")
             ])
             Noop
+        dir (Name(Eq "TMP")) Noop [
+            dir (Name(Match "^\d{4}$")) Noop [] []
+            dir (Name(Match "^\d{4}-\d{2}$")) Noop [ dir' (Name(Match "^\d{4}-\d{2}-\d{2}-")) Noop ] []
+        ] []
         dir (Name(Eq "Downloads")) Noop [] []
         dir
             (And [
@@ -314,5 +315,15 @@ let notProcessedItems =
         file (Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$")) Hide
     ]
 
-for item in notProcessedItems do
-    printfn $"What to do with : {item.FullName}"
+let exitCode =
+    match notProcessedItems with
+    | [] ->
+        printfn "Nothing to do"
+        0
+    | notProcessedItems ->
+        for item in notProcessedItems do
+            printfn $"What to do with : {item.FullName}"
+
+        1
+
+Environment.Exit(exitCode)
