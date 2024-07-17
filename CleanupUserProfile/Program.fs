@@ -217,7 +217,7 @@ let notProcessedItems =
             dir (Name(Match "^\d{4}-\d{2}$")) Noop [ dir' (Name(Match "^\d{4}-\d{2}-\d{2}-")) Noop ] []
         ] []
         dir (Name(Eq "Downloads")) Noop [] []
-        dir
+        dir'
             (And [
                 IsSymLink
                 Or [
@@ -238,7 +238,7 @@ let notProcessedItems =
                     Name(Eq @"Voisinage réseau")
                 ]
             ])
-            Unlink [] []
+            Unlink
         dir' (Name(Eq "dotTraceSnapshots")) DeleteRecursive
         dir' (Name(Eq "RiderSnapshots")) DeleteRecursive
         dir (Name(Eq "Contacts")) Hide [] []
@@ -279,16 +279,19 @@ let notProcessedItems =
             dir' (Name(Eq "Fiddler2")) Noop
             dir' (Name(Eq "Dell")) Noop
             dir (Name(Eq "PowerToys")) Delete [ dir (Name(Eq "Backup")) Delete [] [] ] []
-            dir
-                (Or [
-                    Name(Eq "Ma musique")
-                    Name(Eq "Mes images")
-                    Name(Eq "Mes vidéos")
-                    Name(Eq "My Music")
-                    Name(Eq "My Pictures")
-                    Name(Eq "My Videos")
+            dir'
+                (And [
+                    IsSymLink
+                    Or [
+                        Name(Eq "Ma musique")
+                        Name(Eq "Mes images")
+                        Name(Eq "Mes vidéos")
+                        Name(Eq "My Music")
+                        Name(Eq "My Pictures")
+                        Name(Eq "My Videos")
+                    ]
                 ])
-                Unlink [] []
+                Unlink
             dir'
                 (Or [
                     Name(Eq "IISExpress")
