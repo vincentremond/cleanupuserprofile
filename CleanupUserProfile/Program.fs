@@ -23,6 +23,7 @@ and Action =
     | Unlink
     | Delete
     | DeleteRecursive
+    | ContainsNoFiles
 
 and Condition =
     | Any
@@ -107,6 +108,15 @@ let applyAction (action: Action) (item: FileSystemInfo) =
             printfn $"Deleting dir recursively \"{item.FullName}\""
             dir.Delete(true)
         | _ -> failwith "Cannot delete recursively something that is not a DirectoryInfo"
+    | ContainsNoFiles ->
+        match item with
+        | :? DirectoryInfo as dir ->
+            if Array.isEmpty (dir.GetFiles("*", SearchOption.AllDirectories)) then
+                printfn $"Deleting dir \"{item.FullName}\""
+                dir.Delete(true)
+            else
+                failwith $"Cannot delete dir \"{item.FullName}\" because it contains files"
+        | _ -> failwith "Cannot delete something that is not a DirectoryInfo"
     | Delete ->
         match item with
         | :? DirectoryInfo as dir ->
@@ -297,11 +307,17 @@ let notProcessedItems =
                     Name(Eq "IISExpress")
                     Name(Eq "PowerShell")
                     Name(Eq "WindowsPowerShell")
+                ])
+                Noop
+            dir'
+                (Or [
                     Name(Eq "My Web Sites")
                     Name(Eq "Visual Studio 2017")
                     Name(Eq "Visual Studio 2022")
+                    Name(Eq "SQL Server Management Studio")
+                    Name(Eq "Modèles Office personnalisés")
                 ])
-                Noop
+                ContainsNoFiles
             dir (Name(Eq "Fichiers Outlook")) Noop [] []
             dir (Name(Eq "Zoom")) Noop [] []
         ] [ file (Name(Eq "Default.rdp")) Hide ]
@@ -314,6 +330,9 @@ let notProcessedItems =
             ])
             Hide
 
+        file (Name(Eq "java_error_in_rider64.hprof")) Delete
+        file (Extension(Eq ".mdf")) Delete
+        file (Extension(Eq ".ldf")) Delete
         file (Name(StartsWith @"NTUSER.")) Noop
         file (Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$")) Hide
     ]
