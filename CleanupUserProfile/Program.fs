@@ -275,6 +275,7 @@ let notProcessedItems =
         dir (Name(Eq "ai_overlay_tmp")) Hide [] []
         dir (Name(Eq "Desktop")) Noop [] [
             file (Extension(Eq ".lnk")) Delete
+            file (Extension(Eq ".appref-ms")) Delete
             file (Extension(Eq ".url")) Delete
         ]
         dir' (Name(Eq "Favorites")) Noop
@@ -286,6 +287,8 @@ let notProcessedItems =
         dir (Name(Eq "Documents")) Noop [
             dir (Name(Eq "FeedbackHub")) Delete [] []
             dir (Name(Eq "Custom Office Templates")) Delete [] []
+            dir' (Name(Eq "KerialisLogs")) Noop
+            dir' (Name(Eq "PICRIS")) Noop
             dir' (Name(Eq "Fiddler2")) Noop
             dir' (Name(Eq "Dell")) Noop
             dir (Name(Eq "PowerToys")) Delete [ dir (Name(Eq "Backup")) Delete [] [] ] []
