@@ -33,6 +33,7 @@ and Condition =
     | IsHidden
     | IsReadOnly
     | IsSystem
+    | LastWriteTime of DateTimeCondition
     | And of Condition list
     | Or of Condition list
     | Not of Condition
@@ -41,6 +42,24 @@ and StringRule =
     | StartsWith of string
     | Match of string
     | Eq of string
+
+and DateTimeCondition =
+    | OlderThan of TimeSpan
+    | NewerThan of TimeSpan
+    | Before of DateTime
+    | After of DateTime
+
+let (<&&>) a b =
+    And [
+        a
+        b
+    ]
+
+let (<||>) a b =
+    Or [
+        a
+        b
+    ]
 
 let (</>) a b = Path.Combine(a, b)
 
@@ -79,6 +98,13 @@ let testStringRule str stringRule =
     | Match pattern -> pattern |> Regex |> Regex.isMatch str
     | Eq value -> String.equals str value
 
+let testDateTimeCondition lastWriteTime dateTimeCondition =
+    match dateTimeCondition with
+    | Before dateTime -> lastWriteTime < dateTime
+    | After dateTime -> lastWriteTime > dateTime
+    | NewerThan duration -> (DateTime.Now - lastWriteTime) < duration
+    | OlderThan duration -> (DateTime.Now - lastWriteTime) > duration
+
 let rec testCondition rule (item: FileSystemInfo) =
     match rule with
     | Any -> true
@@ -88,6 +114,7 @@ let rec testCondition rule (item: FileSystemInfo) =
     | IsReadOnly -> item.Attributes.HasFlag(FileAttributes.ReadOnly)
     | IsSystem -> item.Attributes.HasFlag(FileAttributes.System)
     | Extension stringRule -> testStringRule item.Extension stringRule
+    | LastWriteTime dateTimeCondition -> testDateTimeCondition item.LastWriteTime dateTimeCondition
     | And rules -> rules |> List.forall (fun r -> testCondition r item)
     | Or rules -> rules |> List.exists (fun r -> testCondition r item)
     | Not rule -> not <| testCondition rule item
@@ -285,6 +312,7 @@ let notProcessedItems =
         dir (Name(Eq "nuget")) Noop [] [ file (Extension(Eq ".nupkg")) Noop ]
         dir (Name(Eq "source")) Delete [ dir (Name(Eq "repos")) Delete [] [] ] []
         dir (Name(Eq "Documents")) Noop [
+            dir (Name(Eq "Power BI Desktop")) Delete [ dir (Name(Eq "Custom Connectors")) Delete [] [] ] []
             dir (Name(Eq "FeedbackHub")) Delete [] []
             dir (Name(Eq "Custom Office Templates")) Delete [] []
             dir' (Name(Eq "KerialisLogs")) Noop
@@ -337,13 +365,16 @@ let notProcessedItems =
         file (Extension(Eq ".mdf")) Delete
         file (Extension(Eq ".ldf")) Delete
         file (Name(StartsWith @"NTUSER.")) Noop
-        file (Name(Match @"^AzureStorageEmulatorDb\d+(_log)?.(ldf|mdf)$")) Hide
+        file
+            (Name(Match @"(_log)?.(ldf|mdf)$")
+             <&&> LastWriteTime(OlderThan(TimeSpan.FromDays(1.))))
+            Hide
     ]
 
 let exitCode =
     match notProcessedItems with
     | [] ->
-        printfn "Nothing to do"
+        printfn "No manual action required"
         0
     | notProcessedItems ->
         for item in notProcessedItems do
