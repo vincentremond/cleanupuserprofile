@@ -1,7 +1,9 @@
 source https://api.nuget.org/v3/index.json
+source ~/nuget
 
 storage: none
 nuget FSharp.Core
+nuget Pinicola.FSharp.SpectreConsole
 
 group Tests
 
