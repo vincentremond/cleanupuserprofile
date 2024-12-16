@@ -1,6 +1,7 @@
 ﻿open System
 open System.IO
 open System.Text.RegularExpressions
+open Pinicola.FSharp.SpectreConsole
 
 type FileRule = {
     Condition: Condition
@@ -123,23 +124,23 @@ let applyAction (action: Action) (item: FileSystemInfo) =
     match action with
     | Hide ->
         if not <| item.Attributes.HasFlag(FileAttributes.Hidden) then
-            printfn $"Hiding \"{item.FullName}\""
+            AnsiConsole.markupLineInterpolated $"[blue]Hiding[/] \"[bold white]{item.FullName}[/]\""
             item.Attributes <- item.Attributes ||| FileAttributes.Hidden
     | Noop -> ()
     | Unlink ->
-        printfn $"Unlinking \"{item.FullName}\""
+        AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{item.FullName}[/]\""
         item.Delete()
     | DeleteRecursive ->
         match item with
         | :? DirectoryInfo as dir ->
-            printfn $"Deleting dir recursively \"{item.FullName}\""
+            AnsiConsole.markupLineInterpolated $"[blue]Deleting dir recursively[/] \"[bold white]{item.FullName}[/]\""
             dir.Delete(true)
         | _ -> failwith "Cannot delete recursively something that is not a DirectoryInfo"
     | ContainsNoFiles ->
         match item with
         | :? DirectoryInfo as dir ->
             if Array.isEmpty (dir.GetFiles("*", SearchOption.AllDirectories)) then
-                printfn $"Deleting dir \"{item.FullName}\""
+                AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{item.FullName}[/]\""
                 dir.Delete(true)
             else
                 failwith $"Cannot delete dir \"{item.FullName}\" because it contains files"
@@ -147,10 +148,10 @@ let applyAction (action: Action) (item: FileSystemInfo) =
     | Delete ->
         match item with
         | :? DirectoryInfo as dir ->
-            printfn $"Deleting dir \"{item.FullName}\""
+            AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{item.FullName}[/]\""
             dir.Delete(false)
         | :? FileInfo as file ->
-            printfn $"Deleting file \"{item.FullName}\""
+            AnsiConsole.markupLineInterpolated $"[blue]Deleting file[/] \"[bold white]{item.FullName}[/]\""
             file.Delete()
         | _ -> failwith "Cannot delete something that is not a DirectoryInfo or a FileInfo"
 
@@ -374,11 +375,11 @@ let notProcessedItems =
 let exitCode =
     match notProcessedItems with
     | [] ->
-        printfn "No manual action required"
+        AnsiConsole.markupLine "[green]No manual action required[/]"
         0
     | notProcessedItems ->
         for item in notProcessedItems do
-            printfn $"What to do with : {item.FullName}"
+            AnsiConsole.markupLineInterpolated $"[red]What to do with[/] \"[bold white]{item.FullName}[/]\""
 
         1
 
