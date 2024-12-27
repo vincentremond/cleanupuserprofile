@@ -287,7 +287,9 @@ let notProcessedItems =
             dir (Name(Eq "Camera Roll")) Noop [] []
             dir (Name(Eq "Saved Pictures")) Noop [] []
             dir (Name(Eq "Feedback")) Delete [
-                dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ file (Name(Match @"\.png$")) Delete ]
+                dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [
+                    file (Name(Match @"\.png$")) Delete
+                ]
             ] []
         ] []
         dir (Name(Eq "Music")) Hide [] []
