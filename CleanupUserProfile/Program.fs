@@ -1,30 +1,40 @@
 ﻿open System
 open System.IO
 open System.Text.RegularExpressions
+open Pinicola.FSharp.IO
 open Pinicola.FSharp.SpectreConsole
 
 type FileRule = {
     Condition: Condition
-    Action: Action
+    Action: FileAction
 }
 
-and FolderRule = {
+and DirectoryRule = {
     Condition: Condition
-    SelfAction: Action
-    FolderChildRules: FolderChildRules
+    SelfAction: DirectoryAction
+    DirectoryChildRules: DirectoryChildRules
 }
 
-and FolderChildRules =
+and DirectoryChildRules =
     | Noop
-    | Process of FolderRule list * FileRule list
+    | Process of DirectoryRule list * FileRule list
 
-and Action =
+and FileAction =
+    | Hide
+    | Noop
+    | Unlink
+    | Delete
+    | Move of MoveDestination
+
+and DirectoryAction =
     | Hide
     | Noop
     | Unlink
     | Delete
     | DeleteRecursive
     | ContainsNoFiles
+
+and MoveDestination = | SubDirectory of string
 
 and Condition =
     | Any
@@ -64,7 +74,10 @@ let (<||>) a b =
 
 let (</>) a b = Path.Combine(a, b)
 
-let specialFolders = {|
+type D = DirectoryAction
+type F = FileAction
+
+let specialDirectories = {|
     UserProfile =
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
         |> DirectoryInfo
@@ -120,67 +133,80 @@ let rec testCondition rule (item: FileSystemInfo) =
     | Or rules -> rules |> List.exists (fun r -> testCondition r item)
     | Not rule -> not <| testCondition rule item
 
-let applyAction (action: Action) (item: FileSystemInfo) =
+let applyDirectoryAction (action: DirectoryAction) (directoryInfo: DirectoryInfo) =
     match action with
-    | Hide ->
-        if not <| item.Attributes.HasFlag(FileAttributes.Hidden) then
-            AnsiConsole.markupLineInterpolated $"[blue]Hiding[/] \"[bold white]{item.FullName}[/]\""
-            item.Attributes <- item.Attributes ||| FileAttributes.Hidden
-    | Noop -> ()
-    | Unlink ->
-        AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{item.FullName}[/]\""
-        item.Delete()
-    | DeleteRecursive ->
-        match item with
-        | :? DirectoryInfo as dir ->
-            AnsiConsole.markupLineInterpolated $"[blue]Deleting dir recursively[/] \"[bold white]{item.FullName}[/]\""
-            dir.Delete(true)
-        | _ -> failwith "Cannot delete recursively something that is not a DirectoryInfo"
-    | ContainsNoFiles ->
-        match item with
-        | :? DirectoryInfo as dir ->
-            if Array.isEmpty (dir.GetFiles("*", SearchOption.AllDirectories)) then
-                AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{item.FullName}[/]\""
-                dir.Delete(true)
-            else
-                failwith $"Cannot delete dir \"{item.FullName}\" because it contains files"
-        | _ -> failwith "Cannot delete something that is not a DirectoryInfo"
-    | Delete ->
-        match item with
-        | :? DirectoryInfo as dir ->
-            AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{item.FullName}[/]\""
-            dir.Delete(false)
-        | :? FileInfo as file ->
-            AnsiConsole.markupLineInterpolated $"[blue]Deleting file[/] \"[bold white]{item.FullName}[/]\""
-            file.Delete()
-        | _ -> failwith "Cannot delete something that is not a DirectoryInfo or a FileInfo"
+    | D.Hide ->
+        if not <| directoryInfo.Attributes.HasFlag(FileAttributes.Hidden) then
+            AnsiConsole.markupLineInterpolated $"[blue]Hiding[/] \"[bold white]{directoryInfo.FullName}[/]\""
+            directoryInfo.Attributes <- directoryInfo.Attributes ||| FileAttributes.Hidden
+    | D.Noop -> ()
+    | D.Unlink ->
+        AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{directoryInfo.FullName}[/]\""
+        directoryInfo.Delete()
+    | D.DeleteRecursive ->
+        AnsiConsole.markupLineInterpolated $"[blue]Deleting dir recursively[/] \"[bold white]{directoryInfo.FullName}[/]\""
+        directoryInfo.Delete(true)
+    | D.ContainsNoFiles ->
+        if Array.isEmpty (directoryInfo.GetFiles("*", SearchOption.AllDirectories)) then
+            AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{directoryInfo.FullName}[/]\""
+            directoryInfo.Delete(true)
+        else
+            failwith $"Cannot delete dir \"{directoryInfo.FullName}\" because it contains files"
+    | D.Delete ->
+        AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{directoryInfo.FullName}[/]\""
+        directoryInfo.Delete(false)
 
-let rec run (folder: DirectoryInfo) (foldersRules: FolderRule list) (filesRules: FileRule list) =
-    (runFolders folder foldersRules) @ (runFiles folder filesRules)
+let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
+    match action with
+    | F.Hide ->
+        if not <| fileInfo.Attributes.HasFlag(FileAttributes.Hidden) then
+            AnsiConsole.markupLineInterpolated $"[blue]Hiding[/] \"[bold white]{fileInfo.FullName}[/]\""
+            fileInfo.Attributes <- fileInfo.Attributes ||| FileAttributes.Hidden
+    | F.Noop -> ()
+    | F.Unlink ->
+        AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{fileInfo.FullName}[/]\""
+        fileInfo.Delete()
+    | F.Delete ->
+        AnsiConsole.markupLineInterpolated $"[blue]Deleting file[/] \"[bold white]{fileInfo.FullName}[/]\""
+        fileInfo.Delete()
+    | F.Move target ->
+        let computedTargetDirectory =
+            match target with
+            | SubDirectory subDir -> fileInfo.Directory.FullName </> subDir
 
-and runFolders folder foldersRules : FileSystemInfo list =
-    folder.GetDirectories()
+        Directory.ensureExists computedTargetDirectory
+
+        let targetFileFullPath = computedTargetDirectory </> fileInfo.Name
+
+        AnsiConsole.markupLineInterpolated $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
+        fileInfo.MoveTo(targetFileFullPath, overwrite = false)
+
+let rec run (directory: DirectoryInfo) (directorysRules: DirectoryRule list) (filesRules: FileRule list) =
+    (runDirectorys directory directorysRules) @ (runFiles directory filesRules)
+
+and runDirectorys directory directorysRules : FileSystemInfo list =
+    directory.GetDirectories()
     |> Seq.collect (fun dirInfo ->
         let rule =
-            foldersRules
-            |> List.tryPick (fun folderRule ->
-                if testCondition folderRule.Condition dirInfo then
-                    Some folderRule
+            directorysRules
+            |> List.tryPick (fun directoryRule ->
+                if testCondition directoryRule.Condition dirInfo then
+                    Some directoryRule
                 else
                     None
             )
 
         match rule with
-        | Some folderRule ->
+        | Some directoryRule ->
 
             let childResults =
-                match folderRule.FolderChildRules with
-                | FolderChildRules.Process(foldersRules, filesRules) -> run dirInfo foldersRules filesRules
-                | FolderChildRules.Noop -> []
+                match directoryRule.DirectoryChildRules with
+                | DirectoryChildRules.Process(directorysRules, filesRules) -> run dirInfo directorysRules filesRules
+                | DirectoryChildRules.Noop -> []
 
-            // If no issue with the child, apply the action on the folder
+            // If no issue with the child, apply the action on the directory
             if List.isEmpty childResults then
-                applyAction folderRule.SelfAction dirInfo
+                applyDirectoryAction directoryRule.SelfAction dirInfo
 
             childResults
 
@@ -188,8 +214,8 @@ and runFolders folder foldersRules : FileSystemInfo list =
     )
     |> Seq.toList
 
-and runFiles folder filesRules : FileSystemInfo list =
-    folder.GetFiles()
+and runFiles directory filesRules : FileSystemInfo list =
+    directory.GetFiles()
     |> Seq.choose (fun fileInfo ->
 
         if testCondition (Name(Eq "desktop.ini")) fileInfo then
@@ -207,7 +233,7 @@ and runFiles folder filesRules : FileSystemInfo list =
 
             match rule with
             | Some fileRule ->
-                applyAction fileRule.Action fileInfo
+                applyFileAction fileRule.Action fileInfo
                 None
             | None -> Some(fileInfo :> FileSystemInfo)
     )
@@ -218,19 +244,19 @@ let file condition action = {
     Action = action
 }
 
-let dir condition action childFoldersRules childFilesRules = {
+let dir condition action childDirectorysRules childFilesRules = {
     Condition = condition
     SelfAction = action
-    FolderChildRules = FolderChildRules.Process(childFoldersRules, childFilesRules)
+    DirectoryChildRules = DirectoryChildRules.Process(childDirectorysRules, childFilesRules)
 }
 
 let dir' condition action = {
     Condition = condition
     SelfAction = action
-    FolderChildRules = FolderChildRules.Noop
+    DirectoryChildRules = DirectoryChildRules.Noop
 }
 
-let ignoreFolders = [ dir Any ]
+let ignoreDirectorys = [ dir Any ]
 
 let notProcessedItems =
     run userProfile [
@@ -254,7 +280,13 @@ let notProcessedItems =
             dir (Name(Match "^\d{4}$")) Noop [] []
             dir (Name(Match "^\d{4}-\d{2}$")) Noop [ dir' (Name(Match "^\d{4}-\d{2}-\d{2}-")) Noop ] []
         ] []
-        dir (Name(Eq "Downloads")) Noop [] []
+        dir (Name(Eq "Downloads")) Noop [] [
+            file (Or [
+                Extension(Eq ".stl")
+                Extension(Eq ".3mf")
+            ]) (Move(SubDirectory "3d-parts"))
+
+        ]
         dir'
             (And [
                 IsSymLink
@@ -280,39 +312,37 @@ let notProcessedItems =
         dir' (Name(Eq "dotTraceSnapshots")) DeleteRecursive
         dir' (Name(Eq "RiderSnapshots")) DeleteRecursive
         dir (Name(Eq "Contacts")) Hide [] []
-        dir (Name(Eq "Links")) Hide [] [ file (Extension(Eq ".lnk")) Noop ]
+        dir (Name(Eq "Links")) Hide [] [ file (Extension(Eq ".lnk")) F.Noop ]
         dir (Name(Eq "Pictures")) Hide [
             dir' (Name(Eq "Screenpresso")) Noop
             dir (Name(Eq "Wallpapers")) Noop [] []
             dir (Name(Eq "Camera Roll")) Noop [] []
             dir (Name(Eq "Saved Pictures")) Noop [] []
             dir (Name(Eq "Feedback")) Delete [
-                dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [
-                    file (Name(Match @"\.png$")) Delete
-                ]
+                dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ file (Name(Match @"\.png$")) F.Delete ]
             ] []
         ] []
         dir (Name(Eq "Music")) Hide [] []
         dir (Name(Eq "Videos")) Hide [
-            dir (Name(Eq "Captures")) Noop [] [ file (Extension(Eq ".mp4")) Delete ]
+            dir (Name(Eq "Captures")) Noop [] [ file (Extension(Eq ".mp4")) F.Delete ]
             dir (Name(Eq "AnyDesk")) Delete [] []
         ] []
         dir (Name(Eq "Searches")) Hide [] [
-            file (Extension(Eq ".search-ms")) Noop
-            file (Extension(Eq ".searchconnector-ms")) Noop
+            file (Extension(Eq ".search-ms")) F.Noop
+            file (Extension(Eq ".searchconnector-ms")) F.Noop
         ]
         dir (Name(Eq "Saved Games")) Hide [] []
         dir (Name(Eq "ai_overlay_tmp")) Hide [] []
         dir (Name(Eq "Desktop")) Noop [] [
-            file (Extension(Eq ".lnk")) Delete
-            file (Extension(Eq ".appref-ms")) Delete
-            file (Extension(Eq ".url")) Delete
+            file (Extension(Eq ".lnk")) F.Delete
+            file (Extension(Eq ".appref-ms")) F.Delete
+            file (Extension(Eq ".url")) F.Delete
         ]
         dir' (Name(Eq "Favorites")) Noop
         dir' (Name(Eq "IntelGraphicsProfiles")) Hide
         dir' (Name(Eq "Perso")) Noop
         dir (Name(Eq "Postman")) Delete [ dir (Name(Eq "files")) Delete [] [] ] []
-        dir (Name(Eq "nuget")) Noop [] [ file (Extension(Eq ".nupkg")) Noop ]
+        dir (Name(Eq "nuget")) Noop [] [ file (Extension(Eq ".nupkg")) F.Noop ]
         dir (Name(Eq "source")) Delete [ dir (Name(Eq "repos")) Delete [] [] ] []
         dir (Name(Eq "Documents")) Noop [
             dir (Name(Eq "Power BI Desktop")) Delete [ dir (Name(Eq "Custom Connectors")) Delete [] [] ] []
@@ -354,24 +384,24 @@ let notProcessedItems =
                 ContainsNoFiles
             dir (Name(Eq "Fichiers Outlook")) Noop [] []
             dir (Name(Eq "Zoom")) Noop [] []
-        ] [ file (Name(Eq "Default.rdp")) Hide ]
+        ] [ file (Name(Eq "Default.rdp")) F.Hide ]
     ] [
-        file (Name(Eq ".editorconfig")) Noop
+        file (Name(Eq ".editorconfig")) F.Noop
         file
             (Or [
                 Name(StartsWith ".")
                 Name(StartsWith "_")
             ])
-            Hide
+            F.Hide
 
-        file (Name(Eq "java_error_in_rider64.hprof")) Delete
-        file (Extension(Eq ".mdf")) Delete
-        file (Extension(Eq ".ldf")) Delete
-        file (Name(StartsWith @"NTUSER.")) Noop
+        file (Name(Eq "java_error_in_rider64.hprof")) F.Delete
+        file (Extension(Eq ".mdf")) F.Delete
+        file (Extension(Eq ".ldf")) F.Delete
+        file (Name(StartsWith @"NTUSER.")) F.Noop
         file
             (Name(Match @"(_log)?.(ldf|mdf)$")
              <&&> LastWriteTime(OlderThan(TimeSpan.FromDays(1.))))
-            Hide
+            F.Hide
     ]
 
 let exitCode =
