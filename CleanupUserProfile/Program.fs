@@ -281,10 +281,12 @@ let notProcessedItems =
             dir (Name(Match "^\d{4}-\d{2}$")) Noop [ dir' (Name(Match "^\d{4}-\d{2}-\d{2}-")) Noop ] []
         ] []
         dir (Name(Eq "Downloads")) Noop [] [
-            file (Or [
-                Extension(Eq ".stl")
-                Extension(Eq ".3mf")
-            ]) (Move(SubDirectory "3d-parts"))
+            file
+                (Or [
+                    Extension(Eq ".stl")
+                    Extension(Eq ".3mf")
+                ])
+                (Move(SubDirectory "3d-parts"))
 
         ]
         dir'
@@ -315,12 +317,21 @@ let notProcessedItems =
         dir (Name(Eq "Links")) Hide [] [ file (Extension(Eq ".lnk")) F.Noop ]
         dir (Name(Eq "Pictures")) Hide [
             dir' (Name(Eq "Screenpresso")) Noop
-            dir (Name(Eq "Wallpapers")) Noop [] []
+            dir (Name(Eq "Wallpapers")) Noop [] [
+                file
+                    (Or [
+                        Extension(Eq ".png")
+                        Extension(Eq ".jpg")
+                    ])
+                    F.Noop
+            ]
             dir (Name(Eq "Camera Roll")) Noop [] []
             dir (Name(Eq "Saved Pictures")) Noop [] []
             dir (Name(Eq "Feedback")) Delete [
                 dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ file (Name(Match @"\.png$")) F.Delete ]
             ] []
+            dir (Name(Eq "Zwift")) Delete [] [ file (Extension(Eq ".jpg")) F.Delete ]
+            dir (Name(Eq "Screenshots")) Noop [] [ file (Extension(Eq ".png")) F.Delete ]
         ] []
         dir (Name(Eq "Music")) Hide [] []
         dir (Name(Eq "Videos")) Hide [
@@ -352,6 +363,7 @@ let notProcessedItems =
             dir' (Name(Eq "PICRIS")) Noop
             dir' (Name(Eq "Fiddler2")) Noop
             dir' (Name(Eq "Dell")) Noop
+            dir' (Name(Eq "Zwift")) Noop
             dir (Name(Eq "PowerToys")) Delete [ dir (Name(Eq "Backup")) Delete [] [] ] []
             dir'
                 (And [
