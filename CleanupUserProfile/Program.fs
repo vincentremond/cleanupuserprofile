@@ -24,6 +24,7 @@ and FileAction =
     | Noop
     | Unlink
     | Delete
+    | TryDelete
     | Move of MoveDestination
 
 and DirectoryAction =
@@ -51,7 +52,7 @@ and Condition =
 
 and StringRule =
     | StartsWith of string
-    | Match of string
+    | RegexMatch of string
     | Eq of string
 
 and DateTimeCondition =
@@ -109,7 +110,7 @@ module String =
 let testStringRule str stringRule =
     match stringRule with
     | StartsWith prefix -> String.startsWith str prefix
-    | Match pattern -> pattern |> Regex |> Regex.isMatch str
+    | RegexMatch pattern -> pattern |> Regex |> Regex.isMatch str
     | Eq value -> String.equals str value
 
 let testDateTimeCondition lastWriteTime dateTimeCondition =
@@ -169,6 +170,14 @@ let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
     | F.Delete ->
         AnsiConsole.markupLineInterpolated $"[blue]Deleting file[/] \"[bold white]{fileInfo.FullName}[/]\""
         fileInfo.Delete()
+    | F.TryDelete ->
+        AnsiConsole.markupLineInterpolated $"[blue]Trying to delete file[/] \"[bold white]{fileInfo.FullName}[/]\""
+
+        try
+            fileInfo.Delete()
+        with
+        | :? IOException as ex -> AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
+        | ex -> raise ex
     | F.Move target ->
         let computedTargetDirectory =
             match target with
@@ -277,8 +286,8 @@ let notProcessedItems =
             ])
             Noop
         dir (Name(Eq "TMP")) Noop [
-            dir (Name(Match "^\d{4}$")) Noop [] []
-            dir (Name(Match "^\d{4}-\d{2}$")) Noop [ dir' (Name(Match "^\d{4}-\d{2}-\d{2}-")) Noop ] []
+            dir (Name(RegexMatch "^\d{4}$")) Noop [] []
+            dir (Name(RegexMatch "^\d{4}-\d{2}$")) Noop [ dir' (Name(RegexMatch "^\d{4}-\d{2}-\d{2}-")) Noop ] []
         ] []
         dir (Name(Eq "Downloads")) Noop [] [
             file
@@ -328,7 +337,9 @@ let notProcessedItems =
             dir (Name(Eq "Camera Roll")) Noop [] []
             dir (Name(Eq "Saved Pictures")) Noop [] []
             dir (Name(Eq "Feedback")) Delete [
-                dir (Name(Match @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ file (Name(Match @"\.png$")) F.Delete ]
+                dir (Name(RegexMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [
+                    file (Name(RegexMatch @"\.png$")) F.Delete
+                ]
             ] []
             dir (Name(Eq "Zwift")) Delete [] [ file (Extension(Eq ".jpg")) F.Delete ]
             dir (Name(Eq "Screenshots")) Noop [] [ file (Extension(Eq ".png")) F.Delete ]
@@ -406,12 +417,13 @@ let notProcessedItems =
             ])
             F.Hide
 
-        file (Name(Eq "java_error_in_rider64.hprof")) F.Delete
+        file (Name(RegexMatch @"^java_error_in_rider(64)?\.hprof$")) F.Delete
+        file (Name(RegexMatch @"^jcef_\d+.log$")) F.TryDelete
         file (Extension(Eq ".mdf")) F.Delete
         file (Extension(Eq ".ldf")) F.Delete
         file (Name(StartsWith @"NTUSER.")) F.Noop
         file
-            (Name(Match @"(_log)?.(ldf|mdf)$")
+            (Name(RegexMatch @"(_log)?.(ldf|mdf)$")
              <&&> LastWriteTime(OlderThan(TimeSpan.FromDays(1.))))
             F.Hide
     ]
