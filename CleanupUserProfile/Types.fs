@@ -81,7 +81,17 @@ and DirectoryAction =
     | DeleteRecursive
     | ContainsNoFiles
 
-and MoveDestination = | SubDirectory of string
+and MoveDestination =
+    | SubDirectory of string
+    | Directory of DirectoryInfo
+
+    static member initSubDirectory subDir = SubDirectory subDir
+
+    static member initDirectory(dir: string) =
+        if not (Path.IsPathRooted(dir)) then
+            failwith "Directory path must be absolute"
+
+        dir |> DirectoryInfo |> Directory
 
 and Condition =
     | Any
@@ -98,8 +108,10 @@ and Condition =
 
 and StringRule =
     | StartsWith of string
+    | StartsWithAny of string list
     | RegexMatch of string
     | Eq of string
+    | EqAny of string list
 
 and DateTimeCondition =
     | OlderThan of TimeSpan

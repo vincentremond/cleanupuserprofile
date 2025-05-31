@@ -10,8 +10,10 @@ open CleanupUserProfile
 let testStringRule str stringRule =
     match stringRule with
     | StartsWith prefix -> String.startsWithCurrentCultureIgnoreCase str prefix
+    | StartsWithAny prefixes -> prefixes |> List.exists (String.startsWithCurrentCultureIgnoreCase str)
     | RegexMatch pattern -> pattern |> Regex |> Regex.isMatch str
     | Eq value -> String.equalsCurrentCultureIgnoreCase str value
+    | EqAny values -> values |> List.exists (String.equalsCurrentCultureIgnoreCase str)
 
 let testDateTimeCondition lastWriteTime dateTimeCondition =
     match dateTimeCondition with
@@ -76,12 +78,14 @@ let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
         try
             fileInfo.Delete()
         with
-        | :? IOException as ex -> AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
+        | :? IOException as ex ->
+            AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
         | ex -> raise ex
     | F.Move target ->
         let computedTargetDirectory =
             match target with
             | SubDirectory subDir -> fileInfo.Directory.FullName </> subDir
+            | Directory dir -> dir.FullName
 
         Directory.ensureExists computedTargetDirectory
 
@@ -90,8 +94,7 @@ let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
         AnsiConsole.markupLineInterpolated $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
         fileInfo.MoveTo(targetFileFullPath, overwrite = false)
 
-let rec runRoot (root: RootRules) =
-    run root.Directory root.SubRules
+let rec runRoot (root: RootRules) = run root.Directory root.SubRules
 
 and run (directory: DirectoryInfo) (p: Process) =
     (runDirectorys directory p.Directories) @ (runFiles directory p.Files)
@@ -99,17 +102,13 @@ and run (directory: DirectoryInfo) (p: Process) =
 and runDirectorys directory directorysRules : FileSystemInfo list =
     directory.GetDirectories()
     |> Seq.collect (fun dirInfo ->
-        let rule =
+        let rules =
             directorysRules
-            |> List.tryPick (fun directoryRule ->
-                if testCondition directoryRule.Condition dirInfo then
-                    Some directoryRule
-                else
-                    None
-            )
+            |> List.filter (fun directoryRule -> testCondition directoryRule.Condition dirInfo)
 
-        match rule with
-        | Some directoryRule ->
+        match rules with
+        | [] -> [ (dirInfo :> FileSystemInfo) ]
+        | [ directoryRule ] ->
 
             let childResults =
                 match directoryRule.SubRules with
@@ -121,8 +120,11 @@ and runDirectorys directory directorysRules : FileSystemInfo list =
                 applyDirectoryAction directoryRule.SelfAction dirInfo
 
             childResults
+        | rules ->
+            AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{dirInfo.FullName}[/]\""
+            AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
+            [ (dirInfo :> FileSystemInfo) ]
 
-        | None -> [ (dirInfo :> FileSystemInfo) ]
     )
     |> Seq.toList
 
@@ -136,18 +138,17 @@ and runFiles directory filesRules : FileSystemInfo list =
 
             let rule =
                 filesRules
-                |> List.tryPick (fun fileRule ->
-                    if testCondition fileRule.Condition fileInfo then
-                        Some fileRule
-                    else
-                        None
-                )
+                |> List.filter (fun fileRule -> testCondition fileRule.Condition fileInfo)
 
             match rule with
-            | Some fileRule ->
+            | [] -> Some(fileInfo :> FileSystemInfo)
+            | [ fileRule ] ->
                 applyFileAction fileRule.Action fileInfo
                 None
-            | None -> Some(fileInfo :> FileSystemInfo)
+            | rules ->
+                AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""
+                AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
+                Some(fileInfo :> FileSystemInfo)
     )
     |> Seq.toList
 

@@ -83,7 +83,9 @@ module Rules =
                 DR.init (Name(Eq "Camera Roll")) Noop [] []
                 DR.init (Name(Eq "Saved Pictures")) Noop [] []
                 DR.init (Name(Eq "Feedback")) Delete [
-                    DR.init (Name(RegexMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ FR.init (Name(RegexMatch @"\.png$")) F.Delete ]
+                    DR.init (Name(RegexMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [
+                        FR.init (Name(RegexMatch @"\.png$")) F.Delete
+                    ]
                 ] []
                 DR.init (Name(Eq "Zwift")) Delete [] [ FR.init (Extension(Eq ".jpg")) F.Delete ]
                 DR.init (Name(Eq "Screenshots")) Noop [] [ FR.init (Extension(Eq ".png")) F.Delete ]
@@ -155,10 +157,13 @@ module Rules =
         ] [
             FR.init (Name(Eq ".editorconfig")) F.Noop
             FR.init
-                (Or [
-                    Name(StartsWith ".")
-                    Name(StartsWith "_")
-                ])
+                (Name(
+                    StartsWithAny [
+                        "."
+                        "_"
+                    ]
+                 )
+                 <&&> Not(Name(EqAny [ ".editorconfig" ])))
                 F.Hide
 
             FR.init (Name(RegexMatch @"^java_error_in_rider(64)?\.hprof$")) F.Delete
@@ -172,4 +177,21 @@ module Rules =
                 F.Hide
         ]
 
-    let all = [ userProfile ]
+    let googleDrive =
+        RootRules.init (DirectoryInfo(@"G:\My Drive")) [
+            // DR.init (Name(Eq "_ScanSnap")) ContainsNoFiles [] []
+            DR.init (Name(Eq "Google Photos")) ContainsNoFiles [
+                DR.init (Name(RegexMatch "^\d+$")) ContainsNoFiles [
+                    DR.init (Name(RegexMatch "^\d+$")) ContainsNoFiles [] [
+                        FR.init (Extension(Eq ".jpg")) (F.Move(MoveDestination.initDirectory @"G:\My Drive\Photos\_misc"))
+                    ]
+                ] []
+
+            ] []
+
+        ] [ FR.init (Name(Eq "backup.ps1")) F.Noop ]
+
+    let all = [
+        userProfile
+        googleDrive
+    ]
