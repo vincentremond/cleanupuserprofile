@@ -8,6 +8,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Operators.fs" />
+    <Compile Include="Aliases.fs" />
+    <Compile Include="Rules.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
