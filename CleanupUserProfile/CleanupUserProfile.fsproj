@@ -12,6 +12,7 @@
     <Compile Include="Operators.fs" />
     <Compile Include="Aliases.fs" />
     <Compile Include="Rules.fs" />
+    <Compile Include="PhotoTimestamper.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

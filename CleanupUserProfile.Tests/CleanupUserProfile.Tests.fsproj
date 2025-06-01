@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <Compile Include="UnitTest1.fs" />
+    <Compile Include="PhotoTimestamperTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CleanupUserProfile\CleanupUserProfile.fsproj" />

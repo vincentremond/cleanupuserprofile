@@ -59,19 +59,23 @@ let applyDirectoryAction (action: DirectoryAction) (directoryInfo: DirectoryInfo
         AnsiConsole.markupLineInterpolated $"[blue]Deleting dir[/] \"[bold white]{directoryInfo.FullName}[/]\""
         directoryInfo.Delete(false)
 
-let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
+let rec applyFileAction (fileInfo: FileInfo) (action: FileAction) =
     match action with
     | F.Hide ->
         if not <| fileInfo.Attributes.HasFlag(FileAttributes.Hidden) then
             AnsiConsole.markupLineInterpolated $"[blue]Hiding[/] \"[bold white]{fileInfo.FullName}[/]\""
             fileInfo.Attributes <- fileInfo.Attributes ||| FileAttributes.Hidden
-    | F.Noop -> ()
+
+        fileInfo
+    | F.Noop -> fileInfo
     | F.Unlink ->
         AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{fileInfo.FullName}[/]\""
         fileInfo.Delete()
+        fileInfo
     | F.Delete ->
         AnsiConsole.markupLineInterpolated $"[blue]Deleting file[/] \"[bold white]{fileInfo.FullName}[/]\""
         fileInfo.Delete()
+        fileInfo
     | F.TryDelete ->
         AnsiConsole.markupLineInterpolated $"[blue]Trying to delete file[/] \"[bold white]{fileInfo.FullName}[/]\""
 
@@ -81,6 +85,8 @@ let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
         | :? IOException as ex ->
             AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
         | ex -> raise ex
+
+        fileInfo
     | F.Move target ->
         let computedTargetDirectory =
             match target with
@@ -93,6 +99,9 @@ let applyFileAction (action: FileAction) (fileInfo: FileInfo) =
 
         AnsiConsole.markupLineInterpolated $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
         fileInfo.MoveTo(targetFileFullPath, overwrite = false)
+        FileInfo(targetFileFullPath)
+    | F.TimestampPhoto -> PhotoTimestamper.apply fileInfo
+    | F.Multiple actions -> actions |> List.fold applyFileAction fileInfo
 
 let rec runRoot (root: RootRules) = run root.Directory root.SubRules
 
@@ -143,7 +152,7 @@ and runFiles directory filesRules : FileSystemInfo list =
             match rule with
             | [] -> Some(fileInfo :> FileSystemInfo)
             | [ fileRule ] ->
-                applyFileAction fileRule.Action fileInfo
+                applyFileAction fileInfo fileRule.Action |> ignore
                 None
             | rules ->
                 AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""

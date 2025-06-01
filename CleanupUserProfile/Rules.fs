@@ -180,10 +180,29 @@ module Rules =
     let googleDrive =
         RootRules.init (DirectoryInfo(@"G:\My Drive")) [
             // DR.init (Name(Eq "_ScanSnap")) ContainsNoFiles [] []
+            // DR.init (Name(Eq "CCleaner")) ContainsNoFiles [
+            //     DR.init (Name(Eq "Android")) ContainsNoFiles [
+            //         DR.init (Name(Eq "media")) Delete [
+            //             DR.init (Name(Eq "com.whatsapp")) Delete [
+            //                 DR.init (Name(Eq "WhatsApp")) Delete [ DR.init (Name(Eq "Media")) Delete [ DR.init Any Delete [] [] ] [] ] []
+            //             ] []
+            //         ] []
+            //     ] []
+            // ] []
             DR.init (Name(Eq "Google Photos")) ContainsNoFiles [
                 DR.init (Name(RegexMatch "^\d+$")) ContainsNoFiles [
                     DR.init (Name(RegexMatch "^\d+$")) ContainsNoFiles [] [
-                        FR.init (Extension(Eq ".jpg")) (F.Move(MoveDestination.initDirectory @"G:\My Drive\Photos\_misc"))
+                        FR.init
+                            (Extension(
+                                EqAny [
+                                    ".jpg"
+                                    ".mp4"
+                                ]
+                            ))
+                            (F.Multiple [
+                                F.TimestampPhoto
+                                F.Move(MoveDestination.initDirectory @"G:\My Drive\Photos\_misc")
+                            ])
                     ]
                 ] []
 

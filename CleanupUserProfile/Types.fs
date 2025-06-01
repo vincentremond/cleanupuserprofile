@@ -72,6 +72,8 @@ and FileAction =
     | Delete
     | TryDelete
     | Move of MoveDestination
+    | TimestampPhoto
+    | Multiple of FileAction list
 
 and DirectoryAction =
     | Hide
