@@ -147,7 +147,7 @@ module Rules =
                         Name(Eq "My Web Sites")
                         Name(Eq "Visual Studio 2017")
                         Name(Eq "Visual Studio 2022")
-                        Name(Eq "SQL Server Management Studio")
+                        Name(RegexMatch "^SQL Server Management Studio( \d+)?$")
                         Name(Eq "Modèles Office personnalisés")
                     ])
                     ContainsNoFiles

@@ -103,7 +103,11 @@ let rec applyFileAction (fileInfo: FileInfo) (action: FileAction) =
     | F.TimestampPhoto -> PhotoTimestamper.apply fileInfo
     | F.Multiple actions -> actions |> List.fold applyFileAction fileInfo
 
-let rec runRoot (root: RootRules) = run root.Directory root.SubRules
+let rec runRoot (root: RootRules) =
+    if root.Directory.Exists then
+        run root.Directory root.SubRules
+    else
+        []
 
 and run (directory: DirectoryInfo) (p: Process) =
     (runDirectorys directory p.Directories) @ (runFiles directory p.Files)
