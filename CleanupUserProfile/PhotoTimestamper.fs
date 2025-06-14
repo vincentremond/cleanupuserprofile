@@ -109,7 +109,9 @@ module PhotoTimestamper =
                 ExifSubIfdDirectory.TagDateTime
                 ExifSubIfdDirectory.TagDateTimeDigitized
             ]
-            getDate DirectoryHelper.getDirectoryByType<FileMetadataDirectory> [ FileMetadataDirectory.TagFileModifiedDate ]
+            getDate DirectoryHelper.getDirectoryByType<FileMetadataDirectory> [
+                FileMetadataDirectory.TagFileModifiedDate
+            ]
         ]
         |> Result.tryPick (fun getter -> getter metadata)
 
@@ -146,5 +148,7 @@ module PhotoTimestamper =
 
                 $"{timestamp} {fileNameWithoutTimestamp}"
 
-        AnsiConsole.markupLineInterpolated $"[blue]Renaming file[/] \"[bold white]{file.FullName}[/]\" to \"[bold white]{newFileName}[/]\""
+        AnsiConsole.markupLineInterpolated
+            $"[blue]Renaming file[/] \"[bold white]{file.FullName}[/]\" to \"[bold white]{newFileName}[/]\""
+
         rename file newFileName
