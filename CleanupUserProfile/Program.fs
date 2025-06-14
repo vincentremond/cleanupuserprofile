@@ -47,7 +47,9 @@ let applyDirectoryAction (action: DirectoryAction) (directoryInfo: DirectoryInfo
         AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{directoryInfo.FullName}[/]\""
         directoryInfo.Delete()
     | D.DeleteRecursive ->
-        AnsiConsole.markupLineInterpolated $"[blue]Deleting dir recursively[/] \"[bold white]{directoryInfo.FullName}[/]\""
+        AnsiConsole.markupLineInterpolated
+            $"[blue]Deleting dir recursively[/] \"[bold white]{directoryInfo.FullName}[/]\""
+
         directoryInfo.Delete(true)
     | D.ContainsNoFiles ->
         if Array.isEmpty (directoryInfo.GetFiles("*", SearchOption.AllDirectories)) then
@@ -83,7 +85,8 @@ let rec applyFileAction (fileInfo: FileInfo) (action: FileAction) =
             fileInfo.Delete()
         with
         | :? IOException as ex ->
-            AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
+            AnsiConsole.markupLineInterpolated
+                $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
         | ex -> raise ex
 
         fileInfo
@@ -97,7 +100,9 @@ let rec applyFileAction (fileInfo: FileInfo) (action: FileAction) =
 
         let targetFileFullPath = computedTargetDirectory </> fileInfo.Name
 
-        AnsiConsole.markupLineInterpolated $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
+        AnsiConsole.markupLineInterpolated
+            $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
+
         fileInfo.MoveTo(targetFileFullPath, overwrite = false)
         FileInfo(targetFileFullPath)
     | F.TimestampPhoto -> PhotoTimestamper.apply fileInfo
@@ -134,7 +139,9 @@ and runDirectorys directory directorysRules : FileSystemInfo list =
 
             childResults
         | rules ->
-            AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{dirInfo.FullName}[/]\""
+            AnsiConsole.markupLineInterpolated
+                $"[red]Multiple rules match for[/] \"[bold white]{dirInfo.FullName}[/]\""
+
             AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
             [ (dirInfo :> FileSystemInfo) ]
 
@@ -159,7 +166,9 @@ and runFiles directory filesRules : FileSystemInfo list =
                 applyFileAction fileInfo fileRule.Action |> ignore
                 None
             | rules ->
-                AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""
+                AnsiConsole.markupLineInterpolated
+                    $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""
+
                 AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
                 Some(fileInfo :> FileSystemInfo)
     )
