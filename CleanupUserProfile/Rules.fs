@@ -109,6 +109,7 @@ module Rules =
                 FR.init (Extension(Eq ".url")) F.Delete
             ]
             DR.initNoop (Name(Eq "Favorites")) Noop
+            DR.initNoop (Name(Eq "MMSOFT Design")) Noop
             DR.initNoop (Name(Eq "IntelGraphicsProfiles")) Hide
             DR.initNoop (Name(Eq "Perso")) Noop
             DR.init (Name(Eq "Postman")) Delete [ DR.init (Name(Eq "files")) Delete [] [] ] []
@@ -170,12 +171,9 @@ module Rules =
 
             FR.init (Name(RegexMatch @"^java_error_in_rider(64)?\.hprof$")) F.Delete
             FR.init (Name(RegexMatch @"^jcef_\d+.log$")) F.TryDelete
-            FR.init (Extension(Eq ".mdf")) F.Delete
-            FR.init (Extension(Eq ".ldf")) F.Delete
             FR.init (Name(StartsWith @"NTUSER.")) F.Noop
             FR.init
-                (Name(RegexMatch @"(_log)?.(ldf|mdf)$")
-                 <&&> LastWriteTime(OlderThan(TimeSpan.FromDays(1.))))
+                (Name(RegexMatch @"(_log)?.(ldf|mdf)$"))
                 F.Hide
         ]
 
