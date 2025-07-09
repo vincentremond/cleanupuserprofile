@@ -36,7 +36,9 @@ module Rules =
                 DR.init (Name(RegexMatch "^\d{4}-\d{2}$")) Noop [
                     DR.initNoop (Name(RegexMatch "^\d{4}-\d{2}-\d{2}-")) Noop
                 ] []
-            ] []
+            ] [
+                FR.init (Name(Eq ".editorconfig")) F.Noop
+            ]
             DR.init (Name(Eq "Downloads")) Noop [] [
                 FR.init
                     (Or [
@@ -172,9 +174,7 @@ module Rules =
             FR.init (Name(RegexMatch @"^java_error_in_rider(64)?\.hprof$")) F.Delete
             FR.init (Name(RegexMatch @"^jcef_\d+.log$")) F.TryDelete
             FR.init (Name(StartsWith @"NTUSER.")) F.Noop
-            FR.init
-                (Name(RegexMatch @"(_log)?.(ldf|mdf)$"))
-                F.Hide
+            FR.init (Name(RegexMatch @"(_log)?.(ldf|mdf)$")) F.Hide
         ]
 
     let googleDrive =
