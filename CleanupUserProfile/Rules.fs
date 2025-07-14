@@ -35,10 +35,9 @@ module Rules =
                 DR.init (Name(RegexMatch "^\d{4}$")) Noop [] []
                 DR.init (Name(RegexMatch "^\d{4}-\d{2}$")) Noop [
                     DR.initNoop (Name(RegexMatch "^\d{4}-\d{2}-\d{2}-")) Noop
+
                 ] []
-            ] [
-                FR.init (Name(Eq ".editorconfig")) F.Noop
-            ]
+            ] [ FR.init (Name(Eq ".editorconfig")) F.Noop ]
             DR.init (Name(Eq "Downloads")) Noop [] [
                 FR.init
                     (Or [
