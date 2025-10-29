@@ -120,7 +120,7 @@ module Rules =
                 DR.init (Name(Eq "Power BI Desktop")) Delete [ DR.init (Name(Eq "Custom Connectors")) Delete [] [] ] []
                 DR.init (Name(Eq "FeedbackHub")) Delete [] []
                 DR.init (Name(Eq "Custom Office Templates")) Delete [] []
-                DR.initNoop (Name(Eq "KerialisLogs")) Noop
+                DR.initNoop (Name(Eq "afterSentDocuments")) Noop
                 DR.initNoop (Name(Eq "PICRIS")) Noop
                 DR.initNoop (Name(Eq "Fiddler2")) Noop
                 DR.initNoop (Name(Eq "Dell")) Noop

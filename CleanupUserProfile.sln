@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9403D8
 		paket.dependencies = paket.dependencies
 		paket.lock = paket.lock
 		README.md = README.md
-		build.cmd = build.cmd
+		build.ps1 = build.ps1
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Pinicola.FSharp.SpectreConsole", "Pinicola.FSharp\Pinicola.FSharp.SpectreConsole\Pinicola.FSharp.SpectreConsole.fsproj", "{2E8AF6E6-3429-433B-9F0F-5D46A128F8C0}"
