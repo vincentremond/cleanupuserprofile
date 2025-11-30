@@ -12,8 +12,8 @@ let testStringRule str stringRule =
     | StartsWith prefix -> String.startsWithCurrentCultureIgnoreCase str prefix
     | StartsWithAny prefixes -> prefixes |> List.exists (String.startsWithCurrentCultureIgnoreCase str)
     | RegexMatch pattern -> pattern |> Regex |> Regex.isMatch str
-    | Eq value -> String.equalsCurrentCultureIgnoreCase str value
-    | EqAny values -> values |> List.exists (String.equalsCurrentCultureIgnoreCase str)
+    | Eq value -> String.equalsCCIC str value
+    | EqAny values -> values |> List.exists (String.equalsCCIC str)
 
 let testDateTimeCondition lastWriteTime dateTimeCondition =
     match dateTimeCondition with
@@ -47,8 +47,7 @@ let applyDirectoryAction (action: DirectoryAction) (directoryInfo: DirectoryInfo
         AnsiConsole.markupLineInterpolated $"[blue]Unlinking[/] \"[bold white]{directoryInfo.FullName}[/]\""
         directoryInfo.Delete()
     | D.DeleteRecursive ->
-        AnsiConsole.markupLineInterpolated
-            $"[blue]Deleting dir recursively[/] \"[bold white]{directoryInfo.FullName}[/]\""
+        AnsiConsole.markupLineInterpolated $"[blue]Deleting dir recursively[/] \"[bold white]{directoryInfo.FullName}[/]\""
 
         directoryInfo.Delete(true)
     | D.ContainsNoFiles ->
@@ -85,26 +84,24 @@ let rec applyFileAction (fileInfo: FileInfo) (action: FileAction) =
             fileInfo.Delete()
         with
         | :? IOException as ex ->
-            AnsiConsole.markupLineInterpolated
-                $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
+            AnsiConsole.markupLineInterpolated $"[yellow]Cannot delete file[/] \"[bold white]{fileInfo.FullName}[/]\" because {ex.Message}"
         | ex -> raise ex
 
         fileInfo
     | F.Move target ->
         let computedTargetDirectory =
             match target with
-            | SubDirectory subDir -> fileInfo.Directory.FullName </> subDir
-            | Directory dir -> dir.FullName
+            | SubDirectory subDir -> fileInfo.Directory <?//> subDir
+            | Directory dir -> dir
 
         Directory.ensureExists computedTargetDirectory
 
-        let targetFileFullPath = computedTargetDirectory </> fileInfo.Name
+        let targetFileFullPath = computedTargetDirectory <?/> fileInfo.Name
 
-        AnsiConsole.markupLineInterpolated
-            $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
+        AnsiConsole.markupLineInterpolated $"[blue]Moving file[/] \"[bold white]{fileInfo.FullName}[/]\" to \"[bold white]{target}[/]\""
 
-        fileInfo.MoveTo(targetFileFullPath, overwrite = false)
-        FileInfo(targetFileFullPath)
+        fileInfo.MoveTo(targetFileFullPath.FullName, overwrite = false)
+        targetFileFullPath
     | F.TimestampPhoto -> PhotoTimestamper.apply fileInfo
     | F.Multiple actions -> actions |> List.fold applyFileAction fileInfo
 
@@ -139,8 +136,7 @@ and runDirectorys directory directorysRules : FileSystemInfo list =
 
             childResults
         | rules ->
-            AnsiConsole.markupLineInterpolated
-                $"[red]Multiple rules match for[/] \"[bold white]{dirInfo.FullName}[/]\""
+            AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{dirInfo.FullName}[/]\""
 
             AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
             [ (dirInfo :> FileSystemInfo) ]
@@ -166,8 +162,7 @@ and runFiles directory filesRules : FileSystemInfo list =
                 applyFileAction fileInfo fileRule.Action |> ignore
                 None
             | rules ->
-                AnsiConsole.markupLineInterpolated
-                    $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""
+                AnsiConsole.markupLineInterpolated $"[red]Multiple rules match for[/] \"[bold white]{fileInfo.FullName}[/]\""
 
                 AnsiConsole.markupLineInterpolated $"[red]Rules:[/]\n{rules |> List.map string |> String.concatC '\n'}"
                 Some(fileInfo :> FileSystemInfo)
