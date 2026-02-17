@@ -97,6 +97,7 @@ module Rules =
             DR.init (Name(Eq "Videos")) Hide [
                 DR.init (Name(Eq "Captures")) Noop [] [ FR.init (Extension(Eq ".mp4")) F.Delete ]
                 DR.init (Name(Eq "AnyDesk")) Delete [] []
+                DR.init (Name(Eq "Screen Recordings")) Delete [] []
             ] []
             DR.init (Name(Eq "Searches")) Hide [] [
                 FR.init (Extension(Eq ".search-ms")) F.Noop
@@ -174,6 +175,7 @@ module Rules =
             FR.init (Name(RegexMatch @"^jcef_\d+.log$")) F.TryDelete
             FR.init (Name(StartsWith @"NTUSER.")) F.Noop
             FR.init (Name(RegexMatch @"(_log)?.(ldf|mdf)$")) F.Hide
+            FR.init (Name(Eq("AzuriteConfig"))) F.Hide
         ]
 
     let googleDrive =
