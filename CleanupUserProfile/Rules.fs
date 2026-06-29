@@ -46,7 +46,6 @@ module Rules =
                     ])
                     (Move(SubDirectory "3d-parts"))
                 FR.init (Extension(Eq ".gpx")) (Move(SubDirectory "traces-gpx"))
-
             ]
             DR.initNoop
                 (And [
@@ -72,6 +71,7 @@ module Rules =
                 Unlink
             DR.initNoop (Name(Eq "dotTraceSnapshots")) DeleteRecursive
             DR.initNoop (Name(Eq "RiderSnapshots")) DeleteRecursive
+            DR.initNoop (Name(Eq "go")) Hide
             DR.init (Name(Eq "Contacts")) Hide [] []
             DR.init (Name(Eq "Links")) Hide [] [ FileRule.init (Extension(Eq ".lnk")) F.Noop ]
             DR.init (Name(Eq "Pictures")) Hide [
