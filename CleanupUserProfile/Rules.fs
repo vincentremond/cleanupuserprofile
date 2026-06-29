@@ -45,6 +45,7 @@ module Rules =
                         Extension(Eq ".3mf")
                     ])
                     (Move(SubDirectory "3d-parts"))
+                FR.init (Extension(Eq ".gpx")) (Move(SubDirectory "traces-gpx"))
 
             ]
             DR.initNoop
@@ -86,9 +87,7 @@ module Rules =
                 DR.init (Name(Eq "Camera Roll")) Noop [] []
                 DR.init (Name(Eq "Saved Pictures")) Noop [] []
                 DR.init (Name(Eq "Feedback")) Delete [
-                    DR.init
-                        (Name(RegexMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$"))
-                        Delete [] [ FR.init (Name(RegexMatch @"\.png$")) F.Delete ]
+                    DR.init (Name(RegexMatch @"^\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}$")) Delete [] [ FR.init (Name(RegexMatch @"\.png$")) F.Delete ]
                 ] []
                 DR.init (Name(Eq "Zwift")) Delete [] [ FR.init (Extension(Eq ".jpg")) F.Delete ]
                 DR.init (Name(Eq "Screenshots")) Noop [] [ FR.init (Extension(Eq ".png")) F.Delete ]
