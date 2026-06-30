@@ -1,7 +1,7 @@
 STORAGE: NONE
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (10.1.301)
+    FSharp.Core (11.0.100)
     MetadataExtractor (2.9.3)
       System.Memory (>= 4.6.3) - restriction: && (>= netstandard2.0) (< netstandard2.1)
       System.Text.Encoding.CodePages (>= 10.0.5) - restriction: || (&& (< net8.0) (>= netstandard2.1)) (&& (>= netstandard2.0) (< netstandard2.1))
@@ -44,7 +44,7 @@ NUGET
       OpenTelemetry.Extensions.Hosting (>= 1.15.3) - restriction: >= netstandard2.0
       OpenTelemetry.PersistentStorage.FileSystem (>= 1.0.3) - restriction: >= netstandard2.0
     coverlet.collector (10.0.1)
-    FSharp.Core (10.1.301)
+    FSharp.Core (11.0.100)
     Microsoft.ApplicationInsights (3.1.2) - restriction: || (&& (>= net462) (>= netstandard2.0)) (>= net8.0)
       Azure.Monitor.OpenTelemetry.Exporter (>= 1.8) - restriction: || (>= net462) (>= netstandard2.0)
     Microsoft.Bcl.AsyncInterfaces (10.0.9) - restriction: || (&& (>= net462) (>= netstandard2.0)) (>= net8.0)
